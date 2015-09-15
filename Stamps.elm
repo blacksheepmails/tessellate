@@ -149,5 +149,25 @@ drawStamp (shape, pattern) =
         stamp = group <| List.map ((traced (solid black)) << path) shape
         points = List.map fst pattern
         dirs = List.map snd pattern
-    in collage width height <| List.map (\f -> f stamp) <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) pattern 
+    in 
+        collage width height 
+            <| List.map (\f -> f stamp) 
+            <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) 
+            <| pattern 
 
+drawAll : Stamp -> Element 
+drawAll (shape, pattern) = 
+    let
+        stamp : Form
+        stamp = group <| List.map ((traced (solid black)) << path) shape
+        points = List.map fst pattern
+        dirs = List.map snd pattern
+        stamps = 
+            List.map (\f -> f stamp) 
+                <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) 
+                <| pattern 
+        line' = solid red
+        line = { line' | width <- 3.0 }
+    in 
+        collage width height 
+            <| stamps ++ (List.map ((traced line) << path) shape)
