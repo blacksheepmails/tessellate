@@ -120,7 +120,8 @@ model = {stamp = makeTriangleStamp 150 0, --(pi/4),
 drawModel model = div [] 
         [ Html.fromElement <|
             layers 
-                [ if model.editing == False then drawStamp model.stamp else drawPolygon model.stamp.shape
+                --[ draw <| if model.editing == False then drawStamp model.stamp else drawPolygon model.stamp.shape
+                [ drawAll model.stamp
                 , show model.debug ]
         ]
 

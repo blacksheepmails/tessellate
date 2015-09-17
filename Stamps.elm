@@ -144,16 +144,22 @@ makeTriangleStamp size rotation =
     in 
         {shape = shape, pattern = pattern, link = link}
 
-drawPolygon : Polygon -> Element
-drawPolygon shape = 
-    collage width height <| List.map ((traced (solid black)) << path) shape
+drawPolygon : Polygon -> List Form
+drawPolygon shape = List.map ((traced (solid red)) << path) shape
 
-drawStamp : Stamp -> Element
+drawStamp : Stamp -> List Form
 drawStamp stamp = 
     let
         form : Form
         form = group <| List.map ((traced (solid black)) << path) stamp.shape
         points = List.map fst stamp.pattern
         dirs = List.map snd stamp.pattern
-    in collage width height <| List.map (\f -> f form) <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) stamp.pattern 
+    in 
+        List.map (\f -> f form) 
+        <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) stamp.pattern 
 
+draw : List Form -> Element
+draw forms = collage width height forms
+
+drawAll : Stamp -> Element 
+drawAll stamp = draw <| (drawStamp stamp) ++ (drawPolygon stamp.shape)

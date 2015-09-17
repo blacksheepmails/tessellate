@@ -22,8 +22,7 @@ Elm.Main.make = function (_elm) {
    var drawModel = function (model) {
       return A2($Html.div,
       _L.fromArray([]),
-      _L.fromArray([$Html.fromElement($Graphics$Element.layers(_L.fromArray([_U.eq(model.editing,
-                                                                            false) ? $Stamps.drawStamp(model.stamp) : $Stamps.drawPolygon(model.stamp.shape)
+      _L.fromArray([$Html.fromElement($Graphics$Element.layers(_L.fromArray([$Stamps.drawAll(model.stamp)
                                                                             ,$Graphics$Element.show(model.debug)])))]));
    };
    var model = {_: {}
@@ -342,7 +341,7 @@ Elm.Main.make = function (_elm) {
               _v35._0,
               _v35._1);}
          _U.badCase($moduleName,
-         "on line 128, column 45 to 87");
+         "on line 129, column 45 to 87");
       }();
    }),
    $Mouse.isDown,

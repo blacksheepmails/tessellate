@@ -3442,8 +3442,7 @@ Elm.Main.make = function (_elm) {
    var drawModel = function (model) {
       return A2($Html.div,
       _L.fromArray([]),
-      _L.fromArray([$Html.fromElement($Graphics$Element.layers(_L.fromArray([_U.eq(model.editing,
-                                                                            false) ? $Stamps.drawStamp(model.stamp) : $Stamps.drawPolygon(model.stamp.shape)
+      _L.fromArray([$Html.fromElement($Graphics$Element.layers(_L.fromArray([$Stamps.drawAll(model.stamp)
                                                                             ,$Graphics$Element.show(model.debug)])))]));
    };
    var model = {_: {}
@@ -3762,7 +3761,7 @@ Elm.Main.make = function (_elm) {
               _v35._0,
               _v35._1);}
          _U.badCase($moduleName,
-         "on line 128, column 45 to 87");
+         "on line 129, column 45 to 87");
       }();
    }),
    $Mouse.isDown,
@@ -12081,6 +12080,37 @@ Elm.Stamps.make = function (_elm) {
    $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Util = Elm.Util.make(_elm);
+   var drawStamp = function (stamp) {
+      return function () {
+         var dirs = A2($List.map,
+         $Basics.snd,
+         stamp.pattern);
+         var points = A2($List.map,
+         $Basics.fst,
+         stamp.pattern);
+         var form = $Graphics$Collage.group(A2($List.map,
+         function ($) {
+            return $Graphics$Collage.traced($Graphics$Collage.solid($Color.black))($Graphics$Collage.path($));
+         },
+         stamp.shape));
+         return $List.map(function (f) {
+            return f(form);
+         })(A2($List.map,
+         function (x) {
+            return function ($) {
+               return $Graphics$Collage.move($Basics.fst(x))($Graphics$Collage.rotate($Basics.snd(x))($));
+            };
+         },
+         stamp.pattern));
+      }();
+   };
+   var drawPolygon = function (shape) {
+      return A2($List.map,
+      function ($) {
+         return $Graphics$Collage.traced($Graphics$Collage.solid($Color.red))($Graphics$Collage.path($));
+      },
+      shape);
+   };
    var makeTriangleLink = function (shape) {
       return function () {
          var innerFunction = F2(function (side,
@@ -12409,40 +12439,16 @@ Elm.Stamps.make = function (_elm) {
                 ,shape: shape};
       }();
    });
-   var drawPolygon = function (shape) {
-      return A2($Graphics$Collage.collage,
+   var draw = function (forms) {
+      return A3($Graphics$Collage.collage,
       width,
-      height)(A2($List.map,
-      function ($) {
-         return $Graphics$Collage.traced($Graphics$Collage.solid($Color.black))($Graphics$Collage.path($));
-      },
-      shape));
+      height,
+      forms);
    };
-   var drawStamp = function (stamp) {
-      return function () {
-         var dirs = A2($List.map,
-         $Basics.snd,
-         stamp.pattern);
-         var points = A2($List.map,
-         $Basics.fst,
-         stamp.pattern);
-         var form = $Graphics$Collage.group(A2($List.map,
-         function ($) {
-            return $Graphics$Collage.traced($Graphics$Collage.solid($Color.black))($Graphics$Collage.path($));
-         },
-         stamp.shape));
-         return A2($Graphics$Collage.collage,
-         width,
-         height)($List.map(function (f) {
-            return f(form);
-         })(A2($List.map,
-         function (x) {
-            return function ($) {
-               return $Graphics$Collage.move($Basics.fst(x))($Graphics$Collage.rotate($Basics.snd(x))($));
-            };
-         },
-         stamp.pattern)));
-      }();
+   var drawAll = function (stamp) {
+      return draw(A2($Basics._op["++"],
+      drawStamp(stamp),
+      drawPolygon(stamp.shape)));
    };
    _elm.Stamps.values = {_op: _op
                         ,width: width
@@ -12465,7 +12471,9 @@ Elm.Stamps.make = function (_elm) {
                         ,makeSquareStamp: makeSquareStamp
                         ,makeTriangleStamp: makeTriangleStamp
                         ,drawPolygon: drawPolygon
-                        ,drawStamp: drawStamp};
+                        ,drawStamp: drawStamp
+                        ,draw: draw
+                        ,drawAll: drawAll};
    return _elm.Stamps.values;
 };
 Elm.String = Elm.String || {};
