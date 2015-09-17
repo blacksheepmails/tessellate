@@ -160,7 +160,7 @@ model = {stamp = makeSquareStamp 150 0, --(pi/4),
 drawModel model = div [] 
         [ Html.fromElement <|
             layers 
-                [ if model.editing == False then drawStamp model.stamp else drawPolygon <| fst model.stamp
+                [ drawAll model.stamp
                 , show model.debug ]
         ]
 
