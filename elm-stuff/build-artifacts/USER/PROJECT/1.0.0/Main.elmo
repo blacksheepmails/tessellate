@@ -17,12 +17,13 @@ Elm.Main.make = function (_elm) {
    $Mouse = Elm.Mouse.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Stamps = Elm.Stamps.make(_elm);
+   $Stamps = Elm.Stamps.make(_elm),
+   $Util = Elm.Util.make(_elm);
    var drawModel = function (model) {
       return A2($Html.div,
       _L.fromArray([]),
       _L.fromArray([$Html.fromElement($Graphics$Element.layers(_L.fromArray([_U.eq(model.editing,
-                                                                            false) ? $Stamps.drawStamp(model.stamp) : $Stamps.drawPolygon($Basics.fst(model.stamp))
+                                                                            false) ? $Stamps.drawStamp(model.stamp) : $Stamps.drawPolygon(model.stamp.shape)
                                                                             ,$Graphics$Element.show(model.debug)])))]));
    };
    var model = {_: {}
@@ -31,8 +32,7 @@ Elm.Main.make = function (_elm) {
                ,lastPoint: {ctor: "_Tuple2"
                            ,_0: 0
                            ,_1: 0}
-               ,link: $Stamps.makeSquareLink(150)
-               ,stamp: A2($Stamps.makeSquareStamp,
+               ,stamp: A2($Stamps.makeTriangleStamp,
                150,
                0)};
    var toCollageCoords = F2(function (x,
@@ -40,6 +40,14 @@ Elm.Main.make = function (_elm) {
       return {ctor: "_Tuple2"
              ,_0: $Basics.toFloat(x - ($Stamps.width / 2 | 0))
              ,_1: $Basics.toFloat(($Stamps.height / 2 | 0) - y)};
+   });
+   var addDebug = F2(function (msg,
+   model) {
+      return _U.replace([["debug"
+                         ,A2($Basics._op["++"],
+                         model.debug,
+                         msg)]],
+      model);
    });
    var updateLastPoint = F3(function (x,
    y,
@@ -51,258 +59,170 @@ Elm.Main.make = function (_elm) {
       model);
    });
    var insertShapeInStamp = F2(function (shape,
-   _v0) {
+   stamp) {
+      return _U.replace([["shape"
+                         ,shape]],
+      stamp);
+   });
+   var replacePointInSide = F2(function (p,
+   side) {
       return function () {
-         switch (_v0.ctor)
+         var squareDists = A2($List.map,
+         $Util.distSquared(p),
+         side);
+         var index = A2($Util.getIndexOf,
+         function () {
+            var _v0 = $List.minimum(squareDists);
+            switch (_v0.ctor)
+            {case "Just": return _v0._0;}
+            _U.badCase($moduleName,
+            "on line 58, column 29 to 73");
+         }(),
+         squareDists);
+         return _U.eq(index,
+         0) || _U.eq(index,
+         $List.length(side) - 1) ? side : A2($Basics._op["++"],
+         A2($List.take,index,side),
+         A2($Basics._op["++"],
+         _L.fromArray([p]),
+         A2($List.drop,index + 1,side)));
+      }();
+   });
+   var insertPointInSide = F2(function (p,
+   side) {
+      return function () {
+         var squareDists = A2($List.map,
+         $Util.distSquared(p),
+         side);
+         var squareDistSums = A2($Util.mapBetween,
+         F2(function (x,y) {
+            return x + y;
+         }),
+         squareDists);
+         var index = 1 + A2($Util.getIndexOf,
+         function () {
+            var _v2 = $List.minimum(squareDistSums);
+            switch (_v2.ctor)
+            {case "Just": return _v2._0;}
+            _U.badCase($moduleName,
+            "on line 50, column 34 to 81");
+         }(),
+         squareDistSums);
+         return A2($Basics._op["++"],
+         A2($List.take,index,side),
+         A2($Basics._op["++"],
+         _L.fromArray([p]),
+         A2($List.drop,index,side)));
+      }();
+   });
+   var distPointEdge = F2(function (_v4,
+   _v5) {
+      return function () {
+         switch (_v5.ctor)
          {case "_Tuple2":
-            return {ctor: "_Tuple2"
-                   ,_0: shape
-                   ,_1: _v0._1};}
-         _U.badCase($moduleName,
-         "on line 99, column 36 to 44");
-      }();
-   });
-   var mapBetween = F2(function (f,
-   _v4) {
-      return function () {
-         switch (_v4.ctor)
-         {case "::": switch (_v4._1.ctor)
-              {case "::":
-                 return _U.eq(_v4._1._1,
-                   _L.fromArray([])) ? _L.fromArray([A2(f,
-                   _v4._0,
-                   _v4._1._0)]) : A2($List._op["::"],
-                   A2(f,_v4._0,_v4._1._0),
-                   A2(mapBetween,
-                   f,
-                   A2($List._op["::"],
-                   _v4._1._0,
-                   _v4._1._1)));}
-              break;}
-         _U.badCase($moduleName,
-         "between lines 75 and 77");
-      }();
-   });
-   var getIndexOf = F2(function (a,
-   _v10) {
-      return function () {
-         switch (_v10.ctor)
-         {case "::": return _U.eq(a,
-              _v10._0) ? 0 : 1 + A2(getIndexOf,
-              a,
-              _v10._1);}
-         _U.badCase($moduleName,
-         "between lines 70 and 72");
-      }();
-   });
-   var get = F2(function (i,_v14) {
-      return function () {
-         switch (_v14.ctor)
-         {case "::": return _U.eq(i,
-              0) ? _v14._0 : A2(get,
-              i - 1,
-              _v14._1);}
-         _U.badCase($moduleName,
-         "on line 67, column 17 to 51");
-      }();
-   });
-   var $delete = F2(function (i,
-   xs) {
-      return A2($Basics._op["++"],
-      A2($List.take,i,xs),
-      A2($List.drop,i + 1,xs));
-   });
-   var end = function (_v18) {
-      return function () {
-         switch (_v18.ctor)
-         {case "::":
-            return _U.eq(_v18._1,
-              _L.fromArray([])) ? _v18._0 : end(_v18._1);}
-         _U.badCase($moduleName,
-         "on line 48, column 15 to 45");
-      }();
-   };
-   var dot = F2(function (_v22,
-   _v23) {
-      return function () {
-         switch (_v23.ctor)
-         {case "_Tuple2":
-            return function () {
-                 switch (_v22.ctor)
-                 {case "_Tuple2":
-                    return _v22._0 * _v23._0 + _v22._1 * _v23._1;}
-                 _U.badCase($moduleName,
-                 "on line 28, column 23 to 36");
-              }();}
-         _U.badCase($moduleName,
-         "on line 28, column 23 to 36");
-      }();
-   });
-   var mag = function (_v30) {
-      return function () {
-         switch (_v30.ctor)
-         {case "_Tuple2":
-            return $Basics.sqrt(Math.pow(_v30._0,
-              2) + Math.pow(_v30._1,2));}
-         _U.badCase($moduleName,
-         "on line 26, column 13 to 26");
-      }();
-   };
-   var proj = F2(function (v,r) {
-      return A2(dot,v,r) / mag(v);
-   });
-   _op["./"] = F2(function (_v34,
-   k) {
-      return function () {
-         switch (_v34.ctor)
-         {case "_Tuple2":
-            return {ctor: "_Tuple2"
-                   ,_0: _v34._0 / k
-                   ,_1: _v34._1 / k};}
-         _U.badCase($moduleName,
-         "on line 21, column 17 to 25");
-      }();
-   });
-   var replaceList = F3(function (i,
-   v,
-   l) {
-      return A2($Basics._op["++"],
-      A2($List.take,i,l),
-      A2($Basics._op["++"],
-      _L.fromArray([v]),
-      A2($List.drop,i + 1,l)));
-   });
-   var distSquared = F2(function (_v38,
-   _v39) {
-      return function () {
-         switch (_v39.ctor)
-         {case "_Tuple2":
-            return function () {
-                 switch (_v38.ctor)
-                 {case "_Tuple2":
-                    return Math.pow(_v38._0 - _v39._0,
-                      2) + Math.pow(_v38._1 - _v39._1,
-                      2);}
-                 _U.badCase($moduleName,
-                 "on line 13, column 32 to 52");
-              }();}
-         _U.badCase($moduleName,
-         "on line 13, column 32 to 52");
-      }();
-   });
-   var dist = F2(function (p1,p2) {
-      return $Basics.sqrt(A2(distSquared,
-      p1,
-      p2));
-   });
-   var distPointEdge = F2(function (_v46,
-   _v47) {
-      return function () {
-         switch (_v47.ctor)
-         {case "_Tuple2":
-            switch (_v47._0.ctor)
+            switch (_v5._0.ctor)
               {case "_Tuple2":
-                 switch (_v47._1.ctor)
+                 switch (_v5._1.ctor)
                    {case "_Tuple2":
                       return function () {
-                           switch (_v46.ctor)
+                           switch (_v4.ctor)
                            {case "_Tuple2":
                               return function () {
-                                   var distBetweenEnds = A2(dist,
+                                   var distBetweenEnds = A2($Util.dist,
                                    {ctor: "_Tuple2"
-                                   ,_0: _v47._0._0
-                                   ,_1: _v47._0._1},
+                                   ,_0: _v5._0._0
+                                   ,_1: _v5._0._1},
                                    {ctor: "_Tuple2"
-                                   ,_0: _v47._1._0
-                                   ,_1: _v47._1._1});
+                                   ,_0: _v5._1._0
+                                   ,_1: _v5._1._1});
                                    var edge = {ctor: "_Tuple2"
-                                              ,_0: _v47._1._0 - _v47._0._0
-                                              ,_1: _v47._1._1 - _v47._0._1};
+                                              ,_0: _v5._1._0 - _v5._0._0
+                                              ,_1: _v5._1._1 - _v5._0._1};
                                    var $ = edge,
                                    xEdge = $._0,
                                    yEdge = $._1;
-                                   var distFromLine = $Basics.abs(A2(proj,
+                                   var distFromLine = $Basics.abs(A2($Util.proj,
                                    {ctor: "_Tuple2"
                                    ,_0: 0 - yEdge
                                    ,_1: xEdge},
                                    {ctor: "_Tuple2"
-                                   ,_0: _v46._0 - _v47._0._0
-                                   ,_1: _v46._1 - _v47._0._1}));
-                                   var parallelProj1 = $Basics.abs(A2(proj,
+                                   ,_0: _v4._0 - _v5._0._0
+                                   ,_1: _v4._1 - _v5._0._1}));
+                                   var parallelProj1 = $Basics.abs(A2($Util.proj,
                                    edge,
                                    {ctor: "_Tuple2"
-                                   ,_0: _v47._0._0 - _v46._0
-                                   ,_1: _v47._0._1 - _v46._1}));
-                                   var parallelProj2 = $Basics.abs(A2(proj,
+                                   ,_0: _v5._0._0 - _v4._0
+                                   ,_1: _v5._0._1 - _v4._1}));
+                                   var parallelProj2 = $Basics.abs(A2($Util.proj,
                                    edge,
                                    {ctor: "_Tuple2"
-                                   ,_0: _v47._1._0 - _v46._0
-                                   ,_1: _v47._1._1 - _v46._1}));
+                                   ,_0: _v5._1._0 - _v4._0
+                                   ,_1: _v5._1._1 - _v4._1}));
                                    return _U.cmp(parallelProj1,
-                                   distBetweenEnds) > 0 ? A2(dist,
+                                   distBetweenEnds) > 0 ? A2($Util.dist,
                                    {ctor: "_Tuple2"
-                                   ,_0: _v47._1._0
-                                   ,_1: _v47._1._1},
+                                   ,_0: _v5._1._0
+                                   ,_1: _v5._1._1},
                                    {ctor: "_Tuple2"
-                                   ,_0: _v46._0
-                                   ,_1: _v46._1}) : _U.cmp(parallelProj2,
-                                   distBetweenEnds) > 0 ? A2(dist,
+                                   ,_0: _v4._0
+                                   ,_1: _v4._1}) : _U.cmp(parallelProj2,
+                                   distBetweenEnds) > 0 ? A2($Util.dist,
                                    {ctor: "_Tuple2"
-                                   ,_0: _v47._0._0
-                                   ,_1: _v47._0._1},
+                                   ,_0: _v5._0._0
+                                   ,_1: _v5._0._1},
                                    {ctor: "_Tuple2"
-                                   ,_0: _v46._0
-                                   ,_1: _v46._1}) : distFromLine;
+                                   ,_0: _v4._0
+                                   ,_1: _v4._1}) : distFromLine;
                                 }();}
                            _U.badCase($moduleName,
-                           "between lines 32 and 45");
+                           "between lines 16 and 29");
                         }();}
                    break;}
               break;}
          _U.badCase($moduleName,
-         "between lines 32 and 45");
+         "between lines 16 and 29");
       }();
    });
-   var getClosestSide = F2(function (_v58,
+   var getClosestSide = F2(function (_v16,
    shape) {
       return function () {
-         switch (_v58.ctor)
+         switch (_v16.ctor)
          {case "_Tuple2":
             return function () {
-                 var indexedClosest = F2(function (_v62,
-                 _v63) {
+                 var indexedClosest = F2(function (_v20,
+                 _v21) {
                     return function () {
-                       switch (_v63.ctor)
+                       switch (_v21.ctor)
                        {case "_Tuple2":
                           return function () {
-                               switch (_v62.ctor)
+                               switch (_v20.ctor)
                                {case "_Tuple2":
                                   return function () {
                                        var currDist = A2(distPointEdge,
                                        {ctor: "_Tuple2"
-                                       ,_0: _v58._0
-                                       ,_1: _v58._1},
+                                       ,_0: _v16._0
+                                       ,_1: _v16._1},
                                        {ctor: "_Tuple2"
                                        ,_0: function () {
-                                          var _v70 = $List.head(_v62._1);
-                                          switch (_v70.ctor)
-                                          {case "Just": return _v70._0;}
+                                          var _v28 = $List.head(_v20._1);
+                                          switch (_v28.ctor)
+                                          {case "Just": return _v28._0;}
                                           _U.badCase($moduleName,
-                                          "on line 56, column 49 to 83");
+                                          "on line 38, column 49 to 83");
                                        }()
-                                       ,_1: end(_v62._1)});
+                                       ,_1: $Util.end(_v20._1)});
                                        return _U.cmp(currDist,
-                                       _v63._1) < 0 ? {ctor: "_Tuple2"
-                                                      ,_0: _v62._0
+                                       _v21._1) < 0 ? {ctor: "_Tuple2"
+                                                      ,_0: _v20._0
                                                       ,_1: currDist} : {ctor: "_Tuple2"
-                                                                       ,_0: _v63._0
-                                                                       ,_1: _v63._1};
+                                                                       ,_0: _v21._0
+                                                                       ,_1: _v21._1};
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 56 and 59");
+                               "between lines 38 and 41");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 56 and 59");
+                       "between lines 38 and 41");
                     }();
                  });
                  var indexedSides = A2($List.indexedMap,
@@ -320,100 +240,33 @@ Elm.Main.make = function (_elm) {
                  indexedSides));
               }();}
          _U.badCase($moduleName,
-         "between lines 52 and 61");
+         "between lines 34 and 43");
       }();
    });
-   var updateStamp = F4(function (point,
+   var updateStamp = F3(function (point,
    f,
-   link,
    stamp) {
       return function () {
-         var shape = $Basics.fst(stamp);
          var i = A2(getClosestSide,
          point,
-         shape);
-         var $ = A2(link,i,point),
+         stamp.shape);
+         var $ = A2(stamp.link,i,point),
          i$ = $._0,
          point$ = $._1;
+         var shape$ = A3($Util.replaceList,
+         i$,
+         A2(f,
+         point$,
+         A2($Util.get,i$,stamp.shape)),
+         stamp.shape);
          return A2(insertShapeInStamp,
-         A2(replaceList,
+         A3($Util.replaceList,
          i,
          A2(f,
          point,
-         A2(get,
-         i,
-         shape)))(A3(replaceList,
-         i$,
-         A2(f,point$,A2(get,i$,shape)),
-         shape)),
+         A2($Util.get,i,shape$)),
+         shape$),
          stamp);
-      }();
-   });
-   var insertPointInSide = F2(function (p,
-   side) {
-      return function () {
-         var squareDists = A2($List.map,
-         distSquared(p),
-         side);
-         var squareDistSums = A2(mapBetween,
-         F2(function (x,y) {
-            return x + y;
-         }),
-         squareDists);
-         var index = 1 + A2(getIndexOf,
-         function () {
-            var _v72 = $List.minimum(squareDistSums);
-            switch (_v72.ctor)
-            {case "Just": return _v72._0;}
-            _U.badCase($moduleName,
-            "on line 84, column 34 to 81");
-         }(),
-         squareDistSums);
-         return A2($Basics._op["++"],
-         A2($List.take,index,side),
-         A2($Basics._op["++"],
-         _L.fromArray([p]),
-         A2($List.drop,index,side)));
-      }();
-   });
-   var addDebug = F2(function (point,
-   model) {
-      return _U.replace([["debug"
-                         ,A2($Basics._op["++"],
-                         $Basics.toString(point),
-                         $Basics.toString(A2(insertPointInSide,
-                         {ctor: "_Tuple2",_0: 5,_1: 9},
-                         _L.fromArray([{ctor: "_Tuple2"
-                                       ,_0: 1
-                                       ,_1: 3}
-                                      ,{ctor: "_Tuple2",_0: 2,_1: 4}
-                                      ,{ctor: "_Tuple2"
-                                       ,_0: 5
-                                       ,_1: 5}]))))]],
-      model);
-   });
-   var replacePointInSide = F2(function (p,
-   side) {
-      return function () {
-         var squareDists = A2($List.map,
-         distSquared(p),
-         side);
-         var index = A2(getIndexOf,
-         function () {
-            var _v74 = $List.minimum(squareDists);
-            switch (_v74.ctor)
-            {case "Just": return _v74._0;}
-            _U.badCase($moduleName,
-            "on line 92, column 29 to 73");
-         }(),
-         squareDists);
-         return _U.eq(index,
-         0) || _U.eq(index,
-         $List.length(side) - 1) ? side : A2($Basics._op["++"],
-         A2($List.take,index,side),
-         A2($Basics._op["++"],
-         _L.fromArray([p]),
-         A2($List.drop,index + 1,side)));
       }();
    });
    var update = F2(function (action,
@@ -421,35 +274,41 @@ Elm.Main.make = function (_elm) {
       return function () {
          switch (action.ctor)
          {case "Drag":
-            return A2(updateLastPoint,
+            return addDebug($Basics.toString(A2($Util.fromRelativeCoords,
+              A2($Util.toRelativeCoords,
+              {ctor: "_Tuple2",_0: 1,_1: 0},
+              {ctor: "_Tuple2"
+              ,_0: {ctor: "_Tuple2"
+                   ,_0: 0
+                   ,_1: 0}
+              ,_1: {ctor: "_Tuple2"
+                   ,_0: 1
+                   ,_1: 1}}),
+              {ctor: "_Tuple2"
+              ,_0: {ctor: "_Tuple2"
+                   ,_0: 2
+                   ,_1: 2}
+              ,_1: {ctor: "_Tuple2"
+                   ,_0: 3
+                   ,_1: 3}})))(A2(updateLastPoint,
               action._0,
               action._1)(_U.eq(model.lastPoint,
               {ctor: "_Tuple2"
               ,_0: action._0
-              ,_1: action._1}) ? A2(addDebug,
-              A2(toCollageCoords,
-              action._0,
-              action._1),
-              _U.replace([["stamp"
-                          ,A4(updateStamp,
-                          A2(toCollageCoords,
-                          action._0,
-                          action._1),
-                          insertPointInSide,
-                          model.link,
-                          model.stamp)]],
-              model)) : A2(addDebug,
-              A2(toCollageCoords,
-              action._0,
-              action._1),
-              _U.replace([["stamp"
-                          ,A4(updateStamp,
-                          A2(toCollageCoords,
-                          action._0,
-                          action._1),
-                          replacePointInSide,
-                          model.link,
-                          model.stamp)]],
+              ,_1: action._1}) ? _U.replace([["stamp"
+                                             ,A3(updateStamp,
+                                             A2(toCollageCoords,
+                                             action._0,
+                                             action._1),
+                                             insertPointInSide,
+                                             model.stamp)]],
+              model) : _U.replace([["stamp"
+                                   ,A3(updateStamp,
+                                   A2(toCollageCoords,
+                                   action._0,
+                                   action._1),
+                                   replacePointInSide,
+                                   model.stamp)]],
               model)));
             case "MoveMouse":
             return A3(updateLastPoint,
@@ -473,17 +332,17 @@ Elm.Main.make = function (_elm) {
              ,_1: b};
    });
    var mouseSignal = A3($Signal.map2,
-   F2(function (isDown,_v81) {
+   F2(function (isDown,_v35) {
       return function () {
-         switch (_v81.ctor)
+         switch (_v35.ctor)
          {case "_Tuple2":
             return isDown ? A2(Drag,
-              _v81._0,
-              _v81._1) : A2(MoveMouse,
-              _v81._0,
-              _v81._1);}
+              _v35._0,
+              _v35._1) : A2(MoveMouse,
+              _v35._0,
+              _v35._1);}
          _U.badCase($moduleName,
-         "on line 168, column 45 to 87");
+         "on line 128, column 45 to 87");
       }();
    }),
    $Mouse.isDown,
@@ -496,19 +355,8 @@ Elm.Main.make = function (_elm) {
                       ,Drag: Drag
                       ,MoveMouse: MoveMouse
                       ,None: None
-                      ,distSquared: distSquared
-                      ,replaceList: replaceList
-                      ,dist: dist
-                      ,proj: proj
-                      ,mag: mag
-                      ,dot: dot
                       ,distPointEdge: distPointEdge
-                      ,end: end
                       ,getClosestSide: getClosestSide
-                      ,$delete: $delete
-                      ,get: get
-                      ,getIndexOf: getIndexOf
-                      ,mapBetween: mapBetween
                       ,insertPointInSide: insertPointInSide
                       ,replacePointInSide: replacePointInSide
                       ,insertShapeInStamp: insertShapeInStamp

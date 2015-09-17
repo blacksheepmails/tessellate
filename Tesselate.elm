@@ -6,26 +6,10 @@ import Mouse
 import Signal exposing (merge)
 import Html exposing (div)
 import Stamps exposing (..)
+import Util exposing (..)
 
 type Action = Drag Int Int | MoveMouse Int Int | None
 
-distSquared : Point -> Point -> Float
-distSquared (x1,y1) (x2,y2) = (x1-x2)^2 + (y1-y2)^2
-
-replaceList i v l = (List.take i l) ++ [v] ++ (List.drop (i+1) l)
-
-
-dist p1 p2 = sqrt <| distSquared p1 p2
-
-(./) : Point -> Float -> Point
-(./) (x,y) k = (x/k, y/k)
-infixr 4 ./
-
-proj v r = dot v r / (mag v)
-
-mag (x,y) = sqrt (x^2+y^2)
-
-dot (x1,y1) (x2,y2) = x1*x2 + y1*y2
 
 distPointEdge : Point -> Edge -> Float
 distPointEdge (x,y) ((x1,y1),(x2,y2)) =
@@ -45,8 +29,6 @@ distPointEdge (x,y) ((x1,y1),(x2,y2)) =
         | otherwise -> distFromLine
 
 
-end (x::xs) = if xs == [] then x else end xs
-
 getClosestSide : Point -> Polygon -> Int
 getClosestSide (x,y) shape =
     let 
@@ -59,22 +41,6 @@ getClosestSide (x,y) shape =
                 else (i', closest)
     in
         fst <| List.foldl indexedClosest (0,largeNumber) indexedSides
-
-delete : Int -> List a -> List a
-delete i xs = (List.take i xs) ++ (List.drop (i+1) xs)
-
-get : Int -> List a -> a
-get i (x::xs) = if i == 0 then x else get (i-1) xs
-
-getIndexOf : a -> List a -> Int
-getIndexOf a (x::xs) = if
-    | a == x -> 0
-    | otherwise -> 1 + getIndexOf a xs
-
-mapBetween : (a -> a -> b) -> List a -> List b
-mapBetween f (x::y::xs) = if
-    | xs == [] -> [f x y]
-    | otherwise -> f x y :: mapBetween f (y::xs)
 
 insertPointInSide : Point -> Side -> Side
 insertPointInSide p side = 
@@ -96,18 +62,18 @@ replacePointInSide p side =
             else (List.take index side) ++ [p] ++ (List.drop (index+1) side)
 
 insertShapeInStamp : Polygon -> Stamp -> Stamp
-insertShapeInStamp shape (s, p) = (shape, p)
+insertShapeInStamp shape stamp = {stamp | shape <- shape}
 
-updateStamp : Point -> (Point -> Side -> Side) -> Link -> Stamp -> Stamp
-updateStamp point f link stamp = 
+updateStamp : Point -> (Point -> Side -> Side) -> Stamp -> Stamp
+updateStamp point f stamp = 
     let
-        shape = fst stamp
-        i = getClosestSide point shape
-        (i',point') = link i point
+        i = getClosestSide point stamp.shape
+        (i',point') = stamp.link i point
+        shape' : Polygon
+        shape' = replaceList i' (f point' (get i' stamp.shape)) stamp.shape
     in
         insertShapeInStamp
-            (replaceList i (f point (get i shape)) 
-                <| replaceList i' (f point' (get i' shape)) shape)
+            ( replaceList i (f point (get i shape')) shape' )
             stamp
 
 updateLastPoint : Int -> Int -> Model -> Model
@@ -118,30 +84,25 @@ update action model =
     case action of 
       None -> model
       MoveMouse x y -> updateLastPoint x y model
-      Drag x y -> updateLastPoint x y <|
-                    if model.lastPoint == (x,y) 
+      Drag x y -> addDebug (toString <| fromRelativeCoords (toRelativeCoords (1,0) ((0,0),(1,1)) ) ((2,2),(3,3)))
+                    <| updateLastPoint x y
+                    <| if model.lastPoint == (x,y) 
                         then
-                            addDebug (toCollageCoords x y)
                             { model | stamp <- updateStamp
                                                     (toCollageCoords x y) 
                                                     insertPointInSide
-                                                    model.link
                                                     model.stamp
                             }
                         else 
-                            addDebug (toCollageCoords x y)
                             { model | stamp <- updateStamp 
                                                     (toCollageCoords x y)
                                                     replacePointInSide
-                                                    model.link
                                                     model.stamp
                             }
       otherwise -> model
 
-addDebug : Point -> Model -> Model
-addDebug point model = {model | debug <- (toString point) 
-                                      ++ (toString <| insertPointInSide (5, 9) [(1,3), (2,4), (5,5)])
-                        }
+addDebug : String -> Model -> Model
+addDebug msg model = {model | debug <- model.debug ++ msg }
 
 toCollageCoords : Int -> Int -> (Float, Float)
 toCollageCoords x y = 
@@ -151,8 +112,7 @@ toCollageCoords x y =
     )
 
 model : Model
-model = {stamp = makeSquareStamp 150 0, --(pi/4),
-         link = makeSquareLink 150,
+model = {stamp = makeTriangleStamp 150 0, --(pi/4),
          editing = False,
          lastPoint = (0, 0),
          debug = ""}
@@ -160,7 +120,7 @@ model = {stamp = makeSquareStamp 150 0, --(pi/4),
 drawModel model = div [] 
         [ Html.fromElement <|
             layers 
-                [ if model.editing == False then drawStamp model.stamp else drawPolygon <| fst model.stamp
+                [ if model.editing == False then drawStamp model.stamp else drawPolygon model.stamp.shape
                 , show model.debug ]
         ]
 

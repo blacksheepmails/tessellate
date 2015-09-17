@@ -5,33 +5,11 @@ import Graphics.Element exposing (image, layers, show, above, Element)
 import Color exposing (red, black, toRgb, rgb)
 import Set
 import List as List
-
-type alias Dir = Float
-type alias Point = (Float, Float)
-type alias Edge = (Point, Point)
-type alias Side = List Point
-type alias Polygon = List Side
-type alias Pattern = List (Point, Dir)
-type alias Stamp = (Polygon, Pattern)
-type alias Link = Int -> Point -> (Int, Point)
-type alias Model = { stamp : Stamp,
-                     link : Link,
-                     editing : Bool,
-                     lastPoint: (Int,Int),
-                     debug : String }
+import Util exposing (..)
 
 
 width = 1000
 height = 500
-
-edgeToSide : Edge -> Side
-edgeToSide (s,e) = [s,e]
-
-rem2pi : Float -> Float
-rem2pi x = if x >= 2*pi then rem2pi <| x-(2*pi) else x
-
-exteriorAngle : Int -> Float
-exteriorAngle n = let n' = toFloat n in ((n'-2) * pi) / n'
 
 makePoint : Float -> Float -> Point -> Point
 makePoint dist angle (x,y) = 
@@ -51,15 +29,6 @@ ngon n size =
 
 hexagon : Polygon
 hexagon = ngon 6 50
-
-fuzzyEquals : Float -> Float -> Bool
-fuzzyEquals a b = abs (a-b) < 0.01
-
-trunc : Float -> Float
-trunc x = toFloat (round (x * 1000)) / 1000
-
-unions : List (Set.Set Point) -> Set.Set Point
-unions = List.foldl Set.union Set.empty
 
 addNeighbors : (Point -> Pattern) -> List (Point, Dir) -> Set.Set (Point, Dir) -> Set.Set (Point, Dir)
 addNeighbors neighbors (((x,y),dir)::xs) points = 
@@ -122,32 +91,69 @@ opposite n d =
     in
         innerFunction
 
+makeHexLink : Float -> Link
 makeHexLink size = opposite
                         6 
                         (sqrt ( 2*size^2 * (1 - (cos <| exteriorAngle 6)) ))
+
+makeSquareLink : Float -> Link
 makeSquareLink size = opposite 4 size
 
---makeTriangleLink size = 
+makeTriangleLink : Polygon -> Link
+makeTriangleLink shape = 
+    let
+        innerFunction : Link
+        innerFunction side p = if side == 0 
+            then
+                let (s,e) = sideToEdge <| get 0 shape
+                in (0, fromRelativeCoords (toRelativeCoords p (s,e)) (e,s) )
+            else
+                let 
+                    side' = (3 - side) % 3
+                    edge = sideToEdge <| get side shape
+                    edge' = sideToEdge <| get side' shape
+                in 
+                    (side', fromRelativeCoords (negateY <| toRelativeCoords p edge) edge')
+    in
+        innerFunction
 
 makeHexStamp : Float -> Float -> Stamp
-makeHexStamp size rotation = (ngon 6 size, makeHexPattern size rotation)
+makeHexStamp size rotation = 
+    let 
+        shape = ngon 6 size
+        pattern = makeHexPattern size rotation
+        link = makeHexLink size
+    in
+        {shape = shape, pattern = pattern, link = link}
 
 makeSquareStamp : Float -> Float -> Stamp
-makeSquareStamp size rotation = (ngon 4 size, makeSquarePattern size rotation)
+makeSquareStamp size rotation = 
+    let
+        shape = ngon 4 size
+        pattern = makeSquarePattern size rotation
+        link = makeSquareLink size
+    in
+        {shape = shape, pattern = pattern, link = link}
 
 makeTriangleStamp : Float -> Float -> Stamp
-makeTriangleStamp size rotation = (ngon 3 size, makeTrianglePattern size rotation)
+makeTriangleStamp size rotation = 
+    let 
+        shape = ngon 3 size
+        pattern = makeTrianglePattern size rotation
+        link = makeTriangleLink shape
+    in 
+        {shape = shape, pattern = pattern, link = link}
 
 drawPolygon : Polygon -> Element
 drawPolygon shape = 
     collage width height <| List.map ((traced (solid black)) << path) shape
 
 drawStamp : Stamp -> Element
-drawStamp (shape, pattern) = 
+drawStamp stamp = 
     let
-        stamp : Form
-        stamp = group <| List.map ((traced (solid black)) << path) shape
-        points = List.map fst pattern
-        dirs = List.map snd pattern
-    in collage width height <| List.map (\f -> f stamp) <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) pattern 
+        form : Form
+        form = group <| List.map ((traced (solid black)) << path) stamp.shape
+        points = List.map fst stamp.pattern
+        dirs = List.map snd stamp.pattern
+    in collage width height <| List.map (\f -> f form) <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) stamp.pattern 
 
