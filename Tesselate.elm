@@ -112,7 +112,7 @@ toCollageCoords x y =
     )
 
 model : Model
-model = {stamp = makeTriangleStamp 150 0, --(pi/4),
+model = {stamp = makeTriangleStamp 50 0, --(pi/4),
          editing = False,
          lastPoint = (0, 0),
          debug = ""}

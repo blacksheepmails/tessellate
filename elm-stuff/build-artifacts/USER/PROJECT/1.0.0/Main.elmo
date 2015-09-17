@@ -32,7 +32,7 @@ Elm.Main.make = function (_elm) {
                            ,_0: 0
                            ,_1: 0}
                ,stamp: A2($Stamps.makeTriangleStamp,
-               150,
+               50,
                0)};
    var toCollageCoords = F2(function (x,
    y) {

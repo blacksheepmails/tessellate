@@ -30,22 +30,21 @@ ngon n size =
 hexagon : Polygon
 hexagon = ngon 6 50
 
-addNeighbors : (Point -> Pattern) -> List (Point, Dir) -> Set.Set (Point, Dir) -> Set.Set (Point, Dir)
-addNeighbors neighbors (((x,y),dir)::xs) points = 
+addNeighbors : ((Point,Dir,Int) -> Pattern) -> List (Point, Dir,Int) -> Set.Set (Point, Dir,Int) -> Set.Set (Point, Dir,Int)
+addNeighbors neighbors (((x,y),dir,flipped)::xs) points = 
     let
         x' = trunc x
         y' = trunc y
         dir' = trunc dir
-        points' = Set.insert ((x',y'), dir') points
-        discard = abs x > width/2 || abs y > height/2 || Set.member ((x', y'), dir') points
+        points' = Set.insert ((x',y'), dir',flipped) points
+        discard = abs x > width/2 || abs y > height/2 || Set.member ((x', y'), dir',flipped) points
         isSingleton = xs == []
     in
         if
         | isSingleton && discard -> points
         | discard -> addNeighbors neighbors xs points
-        | otherwise -> addNeighbors neighbors (xs ++ neighbors (x,y)) points'
+        | otherwise -> addNeighbors neighbors (xs ++ neighbors ((x,y),dir,flipped)) points'
 
-defaultOrigin = ((0,0), 0)
 largeNumber = 999999999
 
 makeHexPattern : Float -> Float -> Pattern
@@ -54,30 +53,31 @@ makeHexPattern sideLen rotation =
         chordLen = sqrt ( 2*sideLen^2 * (1 - (cos <| exteriorAngle 6)) )
         angles = List.map (\x-> pi*x/3 - pi/6 + rotation) [1..6]
 
-        neighbors : Point -> Pattern
-        neighbors origin = List.map (\x -> (makePoint chordLen x origin, rotation) ) angles
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,_,_) = List.map (\x -> (makePoint chordLen x origin, rotation, 0) ) angles
     in
-        Set.toList <| addNeighbors neighbors [((0,0),rotation)] Set.empty
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
 
 makeSquarePattern: Float -> Float -> Pattern
 makeSquarePattern sideLen rotation =
     let
         angles = List.map (\x-> pi*x/2 + rotation) [1..4]
 
-        neighbors : Point -> Pattern
-        neighbors origin = List.map (\x -> (makePoint sideLen x origin, rotation) ) angles
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,_,_) = List.map (\x -> (makePoint sideLen x origin, rotation, 0) ) angles
     in
-        Set.toList <| addNeighbors neighbors [((0,0), rotation)] Set.empty
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
 
-makeTrianglePattern: Float -> Float -> Pattern
+makeTrianglePattern: Float -> Dir -> Pattern
 makeTrianglePattern sideLen rotation =
     let
         angles = List.map (\x-> pi*x*2/3 + rotation) [1..3]
-
-        neighbors : Point -> Pattern
-        neighbors origin = List.map (\x -> (makePoint sideLen x origin, rotation) ) angles
+        orient (x::y::z::_) = [(x,1), (y,1), (z,0)]
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors ((x,y),rotation',flipped') = List.map (\(angle, flipped) -> (makePoint sideLen angle (x,y), rotation, (flipped+flipped')%2) ) <| orient angles
     in
-        Set.toList <| addNeighbors neighbors [((0,0), rotation)] Set.empty
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+        --neighbors ((0,0), rotation, 0)
 
 opposite : Int -> Float -> Link
 opposite n d = 
@@ -145,18 +145,19 @@ makeTriangleStamp size rotation =
         {shape = shape, pattern = pattern, link = link}
 
 drawPolygon : Polygon -> List Form
-drawPolygon shape = List.map ((traced (solid red)) << path) shape
+drawPolygon shape = List.map ((traced (solid black)) << path) shape
 
 drawStamp : Stamp -> List Form
 drawStamp stamp = 
     let
         form : Form
-        form = group <| List.map ((traced (solid black)) << path) stamp.shape
-        points = List.map fst stamp.pattern
-        dirs = List.map snd stamp.pattern
+        form = group <| List.map ((traced (solid red)) << path) stamp.shape
+        origin = (\(x,_,_) -> x)
+        dir = (\(_,x,_) -> x)
+        xflipped = (\(_,_,x) -> x)
     in 
         List.map (\f -> f form) 
-        <| List.map (\x -> (move <| fst x) << (rotate <| snd x)) stamp.pattern 
+        <| List.map (\x -> (rotate <| dir x) << (move <| origin x) << (if xflipped x == 1 then flipX else identity)) stamp.pattern 
 
 draw : List Form -> Element
 draw forms = collage width height forms
