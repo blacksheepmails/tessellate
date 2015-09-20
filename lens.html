@@ -1,0 +1,70 @@
+<html>
+<body>
+<script>
+
+var width = 800;
+var height = 500;
+var gcanvas = document.createElement('canvas');
+gcanvas.width = width;
+gcanvas.height = height;
+var gcontext = gcanvas.getContext('2d');
+
+var canvas = document.createElement('canvas');
+canvas.width = width;
+canvas.height = height;
+var context = canvas.getContext('2d');
+
+var gimage = new Image();
+
+gimage.src = 'fishtess.png';
+gimage.onload = function() {
+	gcontext.drawImage(gimage, 0, 50);
+	var gimageData = gcontext.getImageData(0, 0, width, height);
+	var gdata = gimageData.data;
+	var imageData = context.createImageData(width, height);
+	var data = imageData.data;
+	
+	for (var x=0; x<width; x=x+1) {
+		for (var y=0; y<height; y=y+1) {
+			var p = {x: x, y: y};
+			var i = 4*(p.y*width + p.x)
+			var gp = roundPoint(uncenter(mapPoint(center(p))))
+			var gi = 4*(gp.y*width + gp.x);
+			for (var c=0; c<4; c++) {
+				data[i+c] = gdata[gi+c]
+			}
+		}
+	}
+	context.putImageData(imageData, 0, 0);
+	console.log('hi');
+};
+
+function roundPoint(p) {
+	return {x: Math.round(p.x), y: Math.round(p.y)}
+}
+
+function center(p) {
+	return {x: p.x-width/2, y: p.y-height/2}
+}
+
+function uncenter(p) {
+	return {x: p.x+width/2, y: p.y+height/2}
+}
+
+function mapPoint(p) {
+	var angle = atanFancy(p);
+	var mag = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+	var newMag = Math.pow(1.02, mag);
+	//var newMag = 100000/(500-mag); //bra
+	//var newMag = 100*Math.cos(0.01 * mag);
+	return {x: newMag*Math.cos(angle), y: newMag*Math.sin(angle) }
+}
+
+function atanFancy(p) {
+	return (p.x < 0) ? Math.PI + Math.atan(p.y/p.x) : Math.atan(p.y/p.x);
+}
+
+document.body.appendChild(canvas);
+</script>
+</body>
+</html>
