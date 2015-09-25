@@ -16,8 +16,6 @@ distPointEdge (x,y) ((x1,y1),(x2,y2)) =
     let
         edge = (x2-x1, y2-y1)
         (xEdge, yEdge) = edge
-        -- two point form : y-y1=m(x-x1)
-        -- cartesian form : 0 = mx - y + (-mx1 + y1)
         distFromLine = abs <| proj (-yEdge, xEdge) (x-x1,y-y1)
         distBetweenEnds = dist (x1,y1) (x2,y2)
         parallelProj1 = abs <| proj edge (x1-x,y1-y)
@@ -84,7 +82,7 @@ update action model =
     case action of 
       None -> model
       MoveMouse x y -> updateLastPoint x y model
-      Drag x y -> addDebug (toString <| fromRelativeCoords (toRelativeCoords (1,0) ((0,0),(1,1)) ) ((2,2),(3,3)))
+      Drag x y -> addDebug (toString <| adjacent <| ngon 4 10)
                     <| updateLastPoint x y
                     <| if model.lastPoint == (x,y) 
                         then
@@ -102,7 +100,7 @@ update action model =
       otherwise -> model
 
 addDebug : String -> Model -> Model
-addDebug msg model = {model | debug <- model.debug ++ msg }
+addDebug msg model = {model | debug <- msg }
 
 toCollageCoords : Int -> Int -> (Float, Float)
 toCollageCoords x y = 
@@ -112,7 +110,7 @@ toCollageCoords x y =
     )
 
 model : Model
-model = {stamp = makeTriangleStamp 50 0, --(pi/4),
+model = {stamp = makeSquare2Stamp 50 0,--(pi/4),
          editing = False,
          lastPoint = (0, 0),
          debug = ""}

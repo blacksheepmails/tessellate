@@ -68,6 +68,21 @@ makeSquarePattern sideLen rotation =
     in
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
 
+
+makeSquare2Pattern: Float -> Float -> Pattern
+makeSquare2Pattern sideLen rotation =
+    let
+        angles = List.map (\x-> pi*x/2 + pi/4 + rotation) [1..4]
+        chordLen = sideLen * sqrt(2)
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,dir,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (dir+pi/4) (0,0) )), rem2pi (dir+rotation+pi), 0) ) angles
+
+    in
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+        --neighbors ((0,0), rotation, 0)
+
+
+
 makeTrianglePattern: Float -> Dir -> Pattern
 makeTrianglePattern sideLen rotation =
     let
@@ -77,7 +92,6 @@ makeTrianglePattern sideLen rotation =
         neighbors ((x,y),rotation',flipped') = List.map (\(angle, flipped) -> (makePoint sideLen angle (x,y), rotation, (flipped+flipped')%2) ) <| orient angles
     in
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
-        --neighbors ((0,0), rotation, 0)
 
 opposite : Int -> Float -> Link
 opposite n d = 
@@ -88,6 +102,20 @@ opposite n d =
         innerFunction side (x,y) =
             let angle' = (toFloat side) * angle + (initAngle)
             in ( (side + n//2) % n, (x + d*(cos angle'), y + d*(sin angle')))
+    in
+        innerFunction
+
+adjacent : Polygon -> Link
+adjacent shape =
+    let
+        n = List.length shape
+        innerFunction : Link
+        innerFunction side p =
+            let 
+                side' = (if odd side then side+1 else side-1) % n
+                (s,e) = sideToEdge <| get side shape
+                (s',e') = sideToEdge <| get side' shape
+            in (side' , fromRelativeCoords (toRelativeCoords p (s,e)) (e',s') )
     in
         innerFunction
 
@@ -132,6 +160,15 @@ makeSquareStamp size rotation =
         shape = ngon 4 size
         pattern = makeSquarePattern size rotation
         link = makeSquareLink size
+    in
+        {shape = shape, pattern = pattern, link = link}
+
+makeSquare2Stamp : Float -> Float -> Stamp
+makeSquare2Stamp size rotation =
+    let
+        shape = ngon 4 size
+        pattern = makeSquare2Pattern size rotation
+        link = adjacent shape
     in
         {shape = shape, pattern = pattern, link = link}
 

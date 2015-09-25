@@ -31,7 +31,7 @@ Elm.Main.make = function (_elm) {
                ,lastPoint: {ctor: "_Tuple2"
                            ,_0: 0
                            ,_1: 0}
-               ,stamp: A2($Stamps.makeTriangleStamp,
+               ,stamp: A2($Stamps.makeSquare2Stamp,
                50,
                0)};
    var toCollageCoords = F2(function (x,
@@ -43,9 +43,7 @@ Elm.Main.make = function (_elm) {
    var addDebug = F2(function (msg,
    model) {
       return _U.replace([["debug"
-                         ,A2($Basics._op["++"],
-                         model.debug,
-                         msg)]],
+                         ,msg]],
       model);
    });
    var updateLastPoint = F3(function (x,
@@ -75,7 +73,7 @@ Elm.Main.make = function (_elm) {
             switch (_v0.ctor)
             {case "Just": return _v0._0;}
             _U.badCase($moduleName,
-            "on line 58, column 29 to 73");
+            "on line 56, column 29 to 73");
          }(),
          squareDists);
          return _U.eq(index,
@@ -104,7 +102,7 @@ Elm.Main.make = function (_elm) {
             switch (_v2.ctor)
             {case "Just": return _v2._0;}
             _U.badCase($moduleName,
-            "on line 50, column 34 to 81");
+            "on line 48, column 34 to 81");
          }(),
          squareDistSums);
          return A2($Basics._op["++"],
@@ -174,12 +172,12 @@ Elm.Main.make = function (_elm) {
                                    ,_1: _v4._1}) : distFromLine;
                                 }();}
                            _U.badCase($moduleName,
-                           "between lines 16 and 29");
+                           "between lines 16 and 27");
                         }();}
                    break;}
               break;}
          _U.badCase($moduleName,
-         "between lines 16 and 29");
+         "between lines 16 and 27");
       }();
    });
    var getClosestSide = F2(function (_v16,
@@ -207,7 +205,7 @@ Elm.Main.make = function (_elm) {
                                           switch (_v28.ctor)
                                           {case "Just": return _v28._0;}
                                           _U.badCase($moduleName,
-                                          "on line 38, column 49 to 83");
+                                          "on line 36, column 49 to 83");
                                        }()
                                        ,_1: $Util.end(_v20._1)});
                                        return _U.cmp(currDist,
@@ -218,10 +216,10 @@ Elm.Main.make = function (_elm) {
                                                                        ,_1: _v21._1};
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 38 and 41");
+                               "between lines 36 and 39");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 38 and 41");
+                       "between lines 36 and 39");
                     }();
                  });
                  var indexedSides = A2($List.indexedMap,
@@ -239,7 +237,7 @@ Elm.Main.make = function (_elm) {
                  indexedSides));
               }();}
          _U.badCase($moduleName,
-         "between lines 34 and 43");
+         "between lines 32 and 41");
       }();
    });
    var updateStamp = F3(function (point,
@@ -273,23 +271,9 @@ Elm.Main.make = function (_elm) {
       return function () {
          switch (action.ctor)
          {case "Drag":
-            return addDebug($Basics.toString(A2($Util.fromRelativeCoords,
-              A2($Util.toRelativeCoords,
-              {ctor: "_Tuple2",_0: 1,_1: 0},
-              {ctor: "_Tuple2"
-              ,_0: {ctor: "_Tuple2"
-                   ,_0: 0
-                   ,_1: 0}
-              ,_1: {ctor: "_Tuple2"
-                   ,_0: 1
-                   ,_1: 1}}),
-              {ctor: "_Tuple2"
-              ,_0: {ctor: "_Tuple2"
-                   ,_0: 2
-                   ,_1: 2}
-              ,_1: {ctor: "_Tuple2"
-                   ,_0: 3
-                   ,_1: 3}})))(A2(updateLastPoint,
+            return addDebug($Basics.toString($Stamps.adjacent(A2($Stamps.ngon,
+              4,
+              10))))(A2(updateLastPoint,
               action._0,
               action._1)(_U.eq(model.lastPoint,
               {ctor: "_Tuple2"
@@ -341,7 +325,7 @@ Elm.Main.make = function (_elm) {
               _v35._0,
               _v35._1);}
          _U.badCase($moduleName,
-         "on line 129, column 45 to 87");
+         "on line 127, column 45 to 87");
       }();
    }),
    $Mouse.isDown,

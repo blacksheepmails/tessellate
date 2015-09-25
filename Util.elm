@@ -20,7 +20,8 @@ type alias Model = { stamp : Stamp,
                      lastPoint: (Int,Int),
                      debug : String }
 
-
+odd : Int -> Bool
+odd x = x%2==1
 
 edgeToSide : Edge -> Side
 edgeToSide (s,e) = [s,e]
