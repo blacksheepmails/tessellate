@@ -3451,7 +3451,7 @@ Elm.Main.make = function (_elm) {
                ,lastPoint: {ctor: "_Tuple2"
                            ,_0: 0
                            ,_1: 0}
-               ,stamp: A2($Stamps.makeSquare2Stamp,
+               ,stamp: A2($Stamps.makeHex2Stamp,
                50,
                0)};
    var toCollageCoords = F2(function (x,
@@ -12071,7 +12071,7 @@ Elm.Stamps.make = function (_elm) {
                switch (_v0.ctor)
                {case "_Tuple3": return _v0._2;}
                _U.badCase($moduleName,
-               "on line 194, column 33 to 34");
+               "on line 213, column 33 to 34");
             }();
          };
          var dir = function (_v5) {
@@ -12079,7 +12079,7 @@ Elm.Stamps.make = function (_elm) {
                switch (_v5.ctor)
                {case "_Tuple3": return _v5._1;}
                _U.badCase($moduleName,
-               "on line 193, column 28 to 29");
+               "on line 212, column 28 to 29");
             }();
          };
          var origin = function (_v10) {
@@ -12088,7 +12088,7 @@ Elm.Stamps.make = function (_elm) {
                {case "_Tuple3":
                   return _v10._0;}
                _U.badCase($moduleName,
-               "on line 192, column 31 to 32");
+               "on line 211, column 31 to 32");
             }();
          };
          var form = $Graphics$Collage.group(A2($List.map,
@@ -12209,7 +12209,7 @@ Elm.Stamps.make = function (_elm) {
                                    ,_1: _v15._1 + d * $Basics.sin(angle$)}};
                     }();}
                _U.badCase($moduleName,
-               "between lines 103 and 104");
+               "between lines 113 and 114");
             }();
          });
          return innerFunction;
@@ -12347,9 +12347,9 @@ Elm.Stamps.make = function (_elm) {
       return function () {
          var angles = A2($List.map,
          function (x) {
-            return $Basics.pi * x / 3 - $Basics.pi / 6 + rotation;
+            return 2 * $Basics.pi * x / 3 - $Basics.pi / 6 + rotation;
          },
-         _L.range(1,6));
+         _L.range(1,3));
          var chordLen = $Basics.sqrt(2 * Math.pow(sideLen,
          2) * (1 - $Basics.cos($Util.exteriorAngle(6))));
          var neighbors = function (_v38) {
@@ -12396,14 +12396,16 @@ Elm.Stamps.make = function (_elm) {
                 ,shape: shape};
       }();
    });
-   var makeSquarePattern = F2(function (sideLen,
+   var makeHex2Pattern = F2(function (sideLen,
    rotation) {
       return function () {
          var angles = A2($List.map,
          function (x) {
-            return $Basics.pi * x / 2 + rotation;
+            return 2 * $Basics.pi * x / 3 - $Basics.pi / 6 + rotation;
          },
-         _L.range(1,4));
+         _L.range(1,3));
+         var chordLen = $Basics.sqrt(2 * Math.pow(sideLen,
+         2) * (1 - $Basics.cos($Util.exteriorAngle(6))));
          var neighbors = function (_v43) {
             return function () {
                switch (_v43.ctor)
@@ -12412,15 +12414,72 @@ Elm.Stamps.make = function (_elm) {
                     function (x) {
                        return {ctor: "_Tuple3"
                               ,_0: A3(makePoint,
+                              chordLen,
+                              x,
+                              A2($Util._op[".+"],
+                              _v43._0,
+                              A3(makePoint,
+                              chordLen,
+                              _v43._1 + $Basics.pi / 6,
+                              {ctor: "_Tuple2",_0: 0,_1: 0})))
+                              ,_1: $Util.rem2pi(rotation + _v43._1 + 2 * $Basics.pi / 3)
+                              ,_2: 0};
+                    },
+                    angles);}
+               _U.badCase($moduleName,
+               "on line 68, column 36 to 167");
+            }();
+         };
+         return $Set.toList(A3(addNeighbors,
+         neighbors,
+         _L.fromArray([{ctor: "_Tuple3"
+                       ,_0: {ctor: "_Tuple2"
+                            ,_0: 0
+                            ,_1: 0}
+                       ,_1: rotation
+                       ,_2: 0}]),
+         $Set.empty));
+      }();
+   });
+   var makeHex2Stamp = F2(function (size,
+   rotation) {
+      return function () {
+         var pattern = A2(makeHex2Pattern,
+         size,
+         rotation);
+         var shape = A2(ngon,6,size);
+         var link = adjacent(shape);
+         return {_: {}
+                ,link: link
+                ,pattern: pattern
+                ,shape: shape};
+      }();
+   });
+   var makeSquarePattern = F2(function (sideLen,
+   rotation) {
+      return function () {
+         var angles = A2($List.map,
+         function (x) {
+            return $Basics.pi * x / 2 + rotation;
+         },
+         _L.range(1,4));
+         var neighbors = function (_v48) {
+            return function () {
+               switch (_v48.ctor)
+               {case "_Tuple3":
+                  return A2($List.map,
+                    function (x) {
+                       return {ctor: "_Tuple3"
+                              ,_0: A3(makePoint,
                               sideLen,
                               x,
-                              _v43._0)
+                              _v48._0)
                               ,_1: rotation
                               ,_2: 0};
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 67, column 34 to 100");
+               "on line 80, column 34 to 100");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12457,9 +12516,9 @@ Elm.Stamps.make = function (_elm) {
             return $Basics.pi * x / 2 + $Basics.pi / 4 + rotation;
          },
          _L.range(1,4));
-         var neighbors = function (_v48) {
+         var neighbors = function (_v53) {
             return function () {
-               switch (_v48.ctor)
+               switch (_v53.ctor)
                {case "_Tuple3":
                   return A2($List.map,
                     function (x) {
@@ -12468,17 +12527,17 @@ Elm.Stamps.make = function (_elm) {
                               chordLen,
                               x,
                               A2($Util._op[".+"],
-                              _v48._0,
+                              _v53._0,
                               A3(makePoint,
                               chordLen,
-                              _v48._1 + $Basics.pi / 4,
+                              _v53._1 + $Basics.pi / 4,
                               {ctor: "_Tuple2",_0: 0,_1: 0})))
-                              ,_1: $Util.rem2pi(_v48._1 + rotation + $Basics.pi)
+                              ,_1: $Util.rem2pi(_v53._1 + rotation + $Basics.pi)
                               ,_2: 0};
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 78, column 36 to 163");
+               "on line 90, column 36 to 163");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12509,27 +12568,27 @@ Elm.Stamps.make = function (_elm) {
    var makeTrianglePattern = F2(function (sideLen,
    rotation) {
       return function () {
-         var orient = function (_v53) {
+         var orient = function (_v58) {
             return function () {
-               switch (_v53.ctor)
+               switch (_v58.ctor)
                {case "::":
-                  switch (_v53._1.ctor)
+                  switch (_v58._1.ctor)
                     {case "::":
-                       switch (_v53._1._1.ctor)
+                       switch (_v58._1._1.ctor)
                          {case "::":
                             return _L.fromArray([{ctor: "_Tuple2"
-                                                 ,_0: _v53._0
+                                                 ,_0: _v58._0
                                                  ,_1: 1}
                                                 ,{ctor: "_Tuple2"
-                                                 ,_0: _v53._1._0
+                                                 ,_0: _v58._1._0
                                                  ,_1: 1}
                                                 ,{ctor: "_Tuple2"
-                                                 ,_0: _v53._1._1._0
+                                                 ,_0: _v58._1._1._0
                                                  ,_1: 0}]);}
                          break;}
                     break;}
                _U.badCase($moduleName,
-               "on line 90, column 31 to 52");
+               "on line 100, column 31 to 52");
             }();
          };
          var angles = A2($List.map,
@@ -12537,34 +12596,34 @@ Elm.Stamps.make = function (_elm) {
             return $Basics.pi * x * 2 / 3 + rotation;
          },
          _L.range(1,3));
-         var neighbors = function (_v61) {
+         var neighbors = function (_v66) {
             return function () {
-               switch (_v61.ctor)
+               switch (_v66.ctor)
                {case "_Tuple3":
-                  switch (_v61._0.ctor)
+                  switch (_v66._0.ctor)
                     {case "_Tuple2":
-                       return $List.map(function (_v68) {
+                       return $List.map(function (_v73) {
                             return function () {
-                               switch (_v68.ctor)
+                               switch (_v73.ctor)
                                {case "_Tuple2":
                                   return {ctor: "_Tuple3"
                                          ,_0: A3(makePoint,
                                          sideLen,
-                                         _v68._0,
+                                         _v73._0,
                                          {ctor: "_Tuple2"
-                                         ,_0: _v61._0._0
-                                         ,_1: _v61._0._1})
+                                         ,_0: _v66._0._0
+                                         ,_1: _v66._0._1})
                                          ,_1: rotation
                                          ,_2: A2($Basics._op["%"],
-                                         _v68._1 + _v61._2,
+                                         _v73._1 + _v66._2,
                                          2)};}
                                _U.badCase($moduleName,
-                               "on line 92, column 80 to 141");
+                               "on line 102, column 80 to 141");
                             }();
                          })(orient(angles));}
                     break;}
                _U.badCase($moduleName,
-               "on line 92, column 48 to 161");
+               "on line 102, column 48 to 161");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12613,6 +12672,7 @@ Elm.Stamps.make = function (_elm) {
                         ,addNeighbors: addNeighbors
                         ,largeNumber: largeNumber
                         ,makeHexPattern: makeHexPattern
+                        ,makeHex2Pattern: makeHex2Pattern
                         ,makeSquarePattern: makeSquarePattern
                         ,makeSquare2Pattern: makeSquare2Pattern
                         ,makeTrianglePattern: makeTrianglePattern
@@ -12622,6 +12682,7 @@ Elm.Stamps.make = function (_elm) {
                         ,makeSquareLink: makeSquareLink
                         ,makeTriangleLink: makeTriangleLink
                         ,makeHexStamp: makeHexStamp
+                        ,makeHex2Stamp: makeHex2Stamp
                         ,makeSquareStamp: makeSquareStamp
                         ,makeSquare2Stamp: makeSquare2Stamp
                         ,makeTriangleStamp: makeTriangleStamp

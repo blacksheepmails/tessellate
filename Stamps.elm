@@ -51,12 +51,25 @@ makeHexPattern : Float -> Float -> Pattern
 makeHexPattern sideLen rotation = 
     let
         chordLen = sqrt ( 2*sideLen^2 * (1 - (cos <| exteriorAngle 6)) )
-        angles = List.map (\x-> pi*x/3 - pi/6 + rotation) [1..6]
+        angles = List.map (\x-> 2*pi*x/3 - pi/6 + rotation) [1..3]
 
         neighbors : (Point, Dir, Int) -> Pattern
         neighbors (origin,_,_) = List.map (\x -> (makePoint chordLen x origin, rotation, 0) ) angles
     in
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+
+makeHex2Pattern : Float -> Float -> Pattern
+makeHex2Pattern sideLen rotation = 
+    let
+        chordLen = sqrt ( 2*sideLen^2 * (1 - (cos <| exteriorAngle 6)) )
+        angles = List.map (\x-> 2*pi*x/3 - pi/6 + rotation) [1..3]
+
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,dir,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (dir+pi/6) (0,0)) ), rem2pi (rotation+dir+2*pi/3), 0) ) angles
+    in
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+        --neighbors ((0,0), rotation, 0)
+
 
 makeSquarePattern: Float -> Float -> Pattern
 makeSquarePattern sideLen rotation =
@@ -68,7 +81,6 @@ makeSquarePattern sideLen rotation =
     in
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
 
-
 makeSquare2Pattern: Float -> Float -> Pattern
 makeSquare2Pattern sideLen rotation =
     let
@@ -79,8 +91,6 @@ makeSquare2Pattern sideLen rotation =
 
     in
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
-        --neighbors ((0,0), rotation, 0)
-
 
 
 makeTrianglePattern: Float -> Dir -> Pattern
@@ -151,6 +161,15 @@ makeHexStamp size rotation =
         shape = ngon 6 size
         pattern = makeHexPattern size rotation
         link = makeHexLink size
+    in
+        {shape = shape, pattern = pattern, link = link}
+
+makeHex2Stamp : Float -> Float -> Stamp
+makeHex2Stamp size rotation = 
+    let 
+        shape = ngon 6 size
+        pattern = makeHex2Pattern size rotation
+        link = adjacent shape
     in
         {shape = shape, pattern = pattern, link = link}
 

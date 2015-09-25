@@ -110,7 +110,7 @@ toCollageCoords x y =
     )
 
 model : Model
-model = {stamp = makeSquare2Stamp 50 0,--(pi/4),
+model = {stamp = makeHex2Stamp 50 0,--(pi/4),
          editing = False,
          lastPoint = (0, 0),
          debug = ""}
