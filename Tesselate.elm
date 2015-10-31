@@ -106,28 +106,23 @@ update action model =
                             }
       SelectShape shape -> {model | shape <- shape}
       SelectPattern pattern_index -> replaceStamp 
-                                        (get pattern_index <| case Dict.get model.shape stampDict of Just v -> v)
+                                        (snd <| get pattern_index <| case Dict.get model.shape stampDict of Just v -> v)
                                         {model | pattern <- pattern_index}
       otherwise -> model
 
 
-stampDict : Dict.Dict String (List Stamp)
-stampDict = Dict.fromList [ ("Triangle", [makeTriangleStamp 100 0])
-                   , ("Square", [makeSquareStamp 70 0, makeSquare2Stamp 70 0])
-                   , ("Hexagon", [makeHexStamp 50 0, makeHex2Stamp 50 0]) ]
+stampDict : Dict.Dict String (List (String, Stamp))
+stampDict = Dict.fromList [ ("Triangle", [("only triangle pattern", makeTriangleStamp 100 0)])
+                          , ("Square", [ ("parallel sides linked", makeSquareStamp 70 0)
+                                       , ("adjacent sides linked", makeSquare2Stamp 70 0)])
+                          , ("Hexagon", [ ("parallel sides linked", makeHexStamp 50 0)
+                                        , ("adjacent sides linked", makeHex2Stamp 50 0)]) ]
 
 addDebug : String -> Model -> Model
 addDebug msg model = {model | debug <- msg }
 
 replaceStamp : Stamp -> Model -> Model
 replaceStamp stamp model = {model | stamp <- stamp}
-
-toCollageCoords : Int -> Int -> (Float, Float)
-toCollageCoords x y = 
-    (
-        toFloat <| x - width//2,
-        toFloat <| height//2 - y
-    )
 
 model : Model
 model = {stamp = emptyStamp,--(pi/4),
@@ -148,12 +143,14 @@ drawTesselation model = div []
 drawSelectors : Signal.Address Action -> Signal.Address Action -> Model -> Html
 drawSelectors shapeAddress patternAddress model = 
     let 
-        formatSelected option selected = if option == selected 
-                                then b [] [text option]
-                                else text option
+        formatSelected option selected = formatSelectedDescription option selected option
+        formatSelectedDescription option selected desc = if option == selected 
+                                then b [] [text desc]
+                                else text desc                        
     in 
         div [] 
-            [ div [id "shape-select"] 
+            [ text "select shape, then select tesselation pattern. idc if the tesselation pattern has no descriptions."
+            , div [id "shape-select"] 
                 [
                     button 
                         [onClick shapeAddress (SelectShape "Triangle") ]
@@ -167,9 +164,9 @@ drawSelectors shapeAddress patternAddress model =
                 ]
             , if model.shape /= ""
                 then div [] <| List.indexedMap 
-                                (\i stamp -> button 
+                                (\i (description, stamp) -> button 
                                                 [onClick patternAddress (SelectPattern i)]
-                                                [formatSelected (toString i) (toString model.pattern)]
+                                                [formatSelectedDescription (toString i) (toString model.pattern) description]
                                 )
                                 (case Dict.get model.shape stampDict of Just v -> v)
                 else
@@ -185,7 +182,7 @@ drawPage shapeAddress patternAddress model = div []
 shapeSelectMailbox = Signal.mailbox None
 patternSelectMailbox = Signal.mailbox None
 
-mouseSignal = Signal.map2 (\isDown (x,y) -> if isDown then Drag x y else MoveMouse x y) Mouse.isDown Mouse.position
+mouseSignal = Signal.map2 (\isDown (x,y) -> if isDown && (inCanvas x y) then Drag x y else MoveMouse x y) Mouse.isDown Mouse.position
 
 main = Signal.map (drawPage shapeSelectMailbox.address patternSelectMailbox.address) 
         <| Signal.foldp update model 

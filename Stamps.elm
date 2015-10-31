@@ -8,9 +8,6 @@ import List as List
 import Util exposing (..)
 
 
-width = 1000
-height = 500
-
 makePoint : Float -> Float -> Point -> Point
 makePoint dist angle (x,y) = 
     let

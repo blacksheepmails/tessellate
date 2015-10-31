@@ -37,12 +37,6 @@ Elm.Main.make = function (_elm) {
                ,pattern: -1
                ,shape: ""
                ,stamp: $Stamps.emptyStamp};
-   var toCollageCoords = F2(function (x,
-   y) {
-      return {ctor: "_Tuple2"
-             ,_0: $Basics.toFloat(x - ($Stamps.width / 2 | 0))
-             ,_1: $Basics.toFloat(($Stamps.height / 2 | 0) - y)};
-   });
    var replaceStamp = F2(function (stamp,
    model) {
       return _U.replace([["stamp"
@@ -57,25 +51,35 @@ Elm.Main.make = function (_elm) {
    });
    var stampDict = $Dict.fromList(_L.fromArray([{ctor: "_Tuple2"
                                                 ,_0: "Triangle"
-                                                ,_1: _L.fromArray([A2($Stamps.makeTriangleStamp,
-                                                100,
-                                                0)])}
+                                                ,_1: _L.fromArray([{ctor: "_Tuple2"
+                                                                   ,_0: "only triangle pattern"
+                                                                   ,_1: A2($Stamps.makeTriangleStamp,
+                                                                   100,
+                                                                   0)}])}
                                                ,{ctor: "_Tuple2"
                                                 ,_0: "Square"
-                                                ,_1: _L.fromArray([A2($Stamps.makeSquareStamp,
-                                                                  70,
-                                                                  0)
-                                                                  ,A2($Stamps.makeSquare2Stamp,
-                                                                  70,
-                                                                  0)])}
+                                                ,_1: _L.fromArray([{ctor: "_Tuple2"
+                                                                   ,_0: "parallel sides linked"
+                                                                   ,_1: A2($Stamps.makeSquareStamp,
+                                                                   70,
+                                                                   0)}
+                                                                  ,{ctor: "_Tuple2"
+                                                                   ,_0: "adjacent sides linked"
+                                                                   ,_1: A2($Stamps.makeSquare2Stamp,
+                                                                   70,
+                                                                   0)}])}
                                                ,{ctor: "_Tuple2"
                                                 ,_0: "Hexagon"
-                                                ,_1: _L.fromArray([A2($Stamps.makeHexStamp,
-                                                                  50,
-                                                                  0)
-                                                                  ,A2($Stamps.makeHex2Stamp,
-                                                                  50,
-                                                                  0)])}]));
+                                                ,_1: _L.fromArray([{ctor: "_Tuple2"
+                                                                   ,_0: "parallel sides linked"
+                                                                   ,_1: A2($Stamps.makeHexStamp,
+                                                                   50,
+                                                                   0)}
+                                                                  ,{ctor: "_Tuple2"
+                                                                   ,_0: "adjacent sides linked"
+                                                                   ,_1: A2($Stamps.makeHex2Stamp,
+                                                                   50,
+                                                                   0)}])}]));
    var updateLastPoint = F3(function (x,
    y,
    model) {
@@ -308,14 +312,14 @@ Elm.Main.make = function (_elm) {
               ,_0: action._0
               ,_1: action._1}) ? _U.replace([["stamp"
                                              ,A3(updateStamp,
-                                             A2(toCollageCoords,
+                                             A2($Util.toCollageCoords,
                                              action._0,
                                              action._1),
                                              insertPointInSide,
                                              model.stamp)]],
               model) : _U.replace([["stamp"
                                    ,A3(updateStamp,
-                                   A2(toCollageCoords,
+                                   A2($Util.toCollageCoords,
                                    action._0,
                                    action._1),
                                    replacePointInSide,
@@ -329,15 +333,15 @@ Elm.Main.make = function (_elm) {
             case "None": return model;
             case "SelectPattern":
             return A2(replaceStamp,
-              $Util.get(action._0)(function () {
+              $Basics.snd($Util.get(action._0)(function () {
                  var _v37 = A2($Dict.get,
                  model.shape,
                  stampDict);
                  switch (_v37.ctor)
                  {case "Just": return _v37._0;}
                  _U.badCase($moduleName,
-                 "on line 109, column 63 to 113");
-              }()),
+                 "on line 109, column 70 to 120");
+              }())),
               _U.replace([["pattern"
                           ,action._0]],
               model));
@@ -377,16 +381,25 @@ Elm.Main.make = function (_elm) {
    patternAddress,
    model) {
       return function () {
-         var formatSelected = F2(function (option,
-         selected) {
+         var formatSelectedDescription = F3(function (option,
+         selected,
+         desc) {
             return _U.eq(option,
             selected) ? A2($Html.b,
             _L.fromArray([]),
-            _L.fromArray([$Html.text(option)])) : $Html.text(option);
+            _L.fromArray([$Html.text(desc)])) : $Html.text(desc);
+         });
+         var formatSelected = F2(function (option,
+         selected) {
+            return A3(formatSelectedDescription,
+            option,
+            selected,
+            option);
          });
          return A2($Html.div,
          _L.fromArray([]),
-         _L.fromArray([A2($Html.div,
+         _L.fromArray([$Html.text("select shape, then select tesselation pattern. idc if the tesselation pattern has no descriptions.")
+                      ,A2($Html.div,
                       _L.fromArray([$Html$Attributes.id("shape-select")]),
                       _L.fromArray([A2($Html.button,
                                    _L.fromArray([A2($Html$Events.onClick,
@@ -411,23 +424,30 @@ Elm.Main.make = function (_elm) {
                                    model.shape)]))]))
                       ,!_U.eq(model.shape,
                       "") ? $Html.div(_L.fromArray([]))(A2($List.indexedMap,
-                      F2(function (i,stamp) {
-                         return A2($Html.button,
-                         _L.fromArray([A2($Html$Events.onClick,
-                         patternAddress,
-                         SelectPattern(i))]),
-                         _L.fromArray([A2(formatSelected,
-                         $Basics.toString(i),
-                         $Basics.toString(model.pattern))]));
+                      F2(function (i,_v39) {
+                         return function () {
+                            switch (_v39.ctor)
+                            {case "_Tuple2":
+                               return A2($Html.button,
+                                 _L.fromArray([A2($Html$Events.onClick,
+                                 patternAddress,
+                                 SelectPattern(i))]),
+                                 _L.fromArray([A3(formatSelectedDescription,
+                                 $Basics.toString(i),
+                                 $Basics.toString(model.pattern),
+                                 _v39._0)]));}
+                            _U.badCase($moduleName,
+                            "between lines 167 and 169");
+                         }();
                       }),
                       function () {
-                         var _v39 = A2($Dict.get,
+                         var _v43 = A2($Dict.get,
                          model.shape,
                          stampDict);
-                         switch (_v39.ctor)
-                         {case "Just": return _v39._0;}
+                         switch (_v43.ctor)
+                         {case "Just": return _v43._0;}
                          _U.badCase($moduleName,
-                         "on line 174, column 34 to 84");
+                         "on line 171, column 34 to 84");
                       }())) : A2($Html.div,
                       _L.fromArray([]),
                       _L.fromArray([]))]));
@@ -456,17 +476,19 @@ Elm.Main.make = function (_elm) {
              ,_1: b};
    });
    var mouseSignal = A3($Signal.map2,
-   F2(function (isDown,_v41) {
+   F2(function (isDown,_v45) {
       return function () {
-         switch (_v41.ctor)
+         switch (_v45.ctor)
          {case "_Tuple2":
-            return isDown ? A2(Drag,
-              _v41._0,
-              _v41._1) : A2(MoveMouse,
-              _v41._0,
-              _v41._1);}
+            return isDown && A2($Util.inCanvas,
+              _v45._0,
+              _v45._1) ? A2(Drag,
+              _v45._0,
+              _v45._1) : A2(MoveMouse,
+              _v45._0,
+              _v45._1);}
          _U.badCase($moduleName,
-         "on line 188, column 45 to 87");
+         "on line 185, column 45 to 105");
       }();
    }),
    $Mouse.isDown,
@@ -496,7 +518,6 @@ Elm.Main.make = function (_elm) {
                       ,stampDict: stampDict
                       ,addDebug: addDebug
                       ,replaceStamp: replaceStamp
-                      ,toCollageCoords: toCollageCoords
                       ,model: model
                       ,drawTesselation: drawTesselation
                       ,drawSelectors: drawSelectors
