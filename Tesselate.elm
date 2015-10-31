@@ -4,12 +4,20 @@ import Color exposing (red, black, toRgb, rgb)
 import Set
 import Mouse
 import Signal exposing (merge)
-import Html exposing (div)
+import Html exposing (div, button, text, b, Html)
+import Html.Attributes exposing (id)
+import Html.Events exposing (onClick)
 import Stamps exposing (..)
 import Util exposing (..)
+import Dict
 
-type Action = Drag Int Int | MoveMouse Int Int | None
-
+type Action = Drag Int Int | MoveMouse Int Int | SelectShape String | SelectPattern Int | None
+type alias Model = { stamp : Stamp,
+                     editing : Bool,
+                     lastPoint: (Int,Int),
+                     shape: String,
+                     pattern: Int,
+                     debug : String }
 
 distPointEdge : Point -> Edge -> Float
 distPointEdge (x,y) ((x1,y1),(x2,y2)) =
@@ -82,8 +90,7 @@ update action model =
     case action of 
       None -> model
       MoveMouse x y -> updateLastPoint x y model
-      Drag x y -> addDebug (toString <| adjacent <| ngon 4 10)
-                    <| updateLastPoint x y
+      Drag x y -> updateLastPoint x y
                     <| if model.lastPoint == (x,y) 
                         then
                             { model | stamp <- updateStamp
@@ -97,10 +104,23 @@ update action model =
                                                     replacePointInSide
                                                     model.stamp
                             }
+      SelectShape shape -> {model | shape <- shape}
+      SelectPattern pattern_index -> replaceStamp 
+                                        (get pattern_index <| case Dict.get model.shape stampDict of Just v -> v)
+                                        {model | pattern <- pattern_index}
       otherwise -> model
+
+
+stampDict : Dict.Dict String (List Stamp)
+stampDict = Dict.fromList [ ("Triangle", [makeTriangleStamp 100 0])
+                   , ("Square", [makeSquareStamp 70 0, makeSquare2Stamp 70 0])
+                   , ("Hexagon", [makeHexStamp 50 0, makeHex2Stamp 50 0]) ]
 
 addDebug : String -> Model -> Model
 addDebug msg model = {model | debug <- msg }
+
+replaceStamp : Stamp -> Model -> Model
+replaceStamp stamp model = {model | stamp <- stamp}
 
 toCollageCoords : Int -> Int -> (Float, Float)
 toCollageCoords x y = 
@@ -110,20 +130,63 @@ toCollageCoords x y =
     )
 
 model : Model
-model = {stamp = makeHex2Stamp 50 0,--(pi/4),
+model = {stamp = emptyStamp,--(pi/4),
          editing = False,
          lastPoint = (0, 0),
+         shape = "",
+         pattern = -1,
          debug = ""}
 
-drawModel model = div [] 
+drawTesselation : Model -> Html
+drawTesselation model = div [] 
         [ Html.fromElement <|
             layers 
-                --[ draw <| if model.editing == False then drawStamp model.stamp else drawPolygon model.stamp.shape
                 [ drawAll model.stamp
                 , show model.debug ]
         ]
 
+drawSelectors : Signal.Address Action -> Signal.Address Action -> Model -> Html
+drawSelectors shapeAddress patternAddress model = 
+    let 
+        formatSelected option selected = if option == selected 
+                                then b [] [text option]
+                                else text option
+    in 
+        div [] 
+            [ div [id "shape-select"] 
+                [
+                    button 
+                        [onClick shapeAddress (SelectShape "Triangle") ]
+                        [formatSelected "Triangle" model.shape],
+                    button
+                        [onClick shapeAddress (SelectShape "Square")]
+                        [formatSelected "Square" model.shape],
+                    button
+                        [onClick shapeAddress (SelectShape "Hexagon")]
+                        [formatSelected "Hexagon" model.shape]
+                ]
+            , if model.shape /= ""
+                then div [] <| List.indexedMap 
+                                (\i stamp -> button 
+                                                [onClick patternAddress (SelectPattern i)]
+                                                [formatSelected (toString i) (toString model.pattern)]
+                                )
+                                (case Dict.get model.shape stampDict of Just v -> v)
+                else
+                    div [] []
+            ]
+
+drawPage : Signal.Address Action -> Signal.Address Action -> Model -> Html
+drawPage shapeAddress patternAddress model = div []
+    [ drawTesselation model,
+      drawSelectors shapeAddress patternAddress model
+    ]
+
+shapeSelectMailbox = Signal.mailbox None
+patternSelectMailbox = Signal.mailbox None
 
 mouseSignal = Signal.map2 (\isDown (x,y) -> if isDown then Drag x y else MoveMouse x y) Mouse.isDown Mouse.position
 
-main = Signal.map drawModel <| Signal.foldp update model mouseSignal
+main = Signal.map (drawPage shapeSelectMailbox.address patternSelectMailbox.address) 
+        <| Signal.foldp update model 
+        <| Signal.mergeMany [mouseSignal, shapeSelectMailbox.signal, patternSelectMailbox.signal]

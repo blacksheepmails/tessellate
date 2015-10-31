@@ -27,9 +27,6 @@ ngon n size =
     in
         List.map edgeToSide <| List.scanl (makeEdge size) ((0,0), (size,0)) <| List.map (\x->x*angle) [1.0 .. (toFloat n-1)]
 
-hexagon : Polygon
-hexagon = ngon 6 50
-
 addNeighbors : ((Point,Dir,Int) -> Pattern) -> List (Point, Dir,Int) -> Set.Set (Point, Dir,Int) -> Set.Set (Point, Dir,Int)
 addNeighbors neighbors (((x,y),dir,flipped)::xs) points = 
     let
@@ -44,8 +41,6 @@ addNeighbors neighbors (((x,y),dir,flipped)::xs) points =
         | isSingleton && discard -> points
         | discard -> addNeighbors neighbors xs points
         | otherwise -> addNeighbors neighbors (xs ++ neighbors ((x,y),dir,flipped)) points'
-
-largeNumber = 999999999
 
 makeHexPattern : Float -> Float -> Pattern
 makeHexPattern sideLen rotation = 
@@ -103,17 +98,21 @@ makeTrianglePattern sideLen rotation =
     in
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
 
-opposite : Int -> Float -> Link
-opposite n d = 
+
+opposite : Polygon -> Link
+opposite shape = 
     let
-        angle = 2 * pi / (toFloat n)
-        initAngle = pi/2
+        n = List.length shape
         innerFunction : Link
-        innerFunction side (x,y) =
-            let angle' = (toFloat side) * angle + (initAngle)
-            in ( (side + n//2) % n, (x + d*(cos angle'), y + d*(sin angle')))
+        innerFunction side p =
+            let 
+                side' = (side+(n//2)) % n
+                (s,e) = sideToEdge <| get side shape
+                (s',e') = sideToEdge <| get side' shape
+            in (side' , fromRelativeCoords (toRelativeCoords p (s,e)) (e',s') )
     in
         innerFunction
+
 
 adjacent : Polygon -> Link
 adjacent shape =
@@ -128,14 +127,6 @@ adjacent shape =
             in (side' , fromRelativeCoords (toRelativeCoords p (s,e)) (e',s') )
     in
         innerFunction
-
-makeHexLink : Float -> Link
-makeHexLink size = opposite
-                        6 
-                        (sqrt ( 2*size^2 * (1 - (cos <| exteriorAngle 6)) ))
-
-makeSquareLink : Float -> Link
-makeSquareLink size = opposite 4 size
 
 makeTriangleLink : Polygon -> Link
 makeTriangleLink shape = 
@@ -160,7 +151,7 @@ makeHexStamp size rotation =
     let 
         shape = ngon 6 size
         pattern = makeHexPattern size rotation
-        link = makeHexLink size
+        link = opposite shape
     in
         {shape = shape, pattern = pattern, link = link}
 
@@ -178,7 +169,7 @@ makeSquareStamp size rotation =
     let
         shape = ngon 4 size
         pattern = makeSquarePattern size rotation
-        link = makeSquareLink size
+        link = opposite shape
     in
         {shape = shape, pattern = pattern, link = link}
 
@@ -199,6 +190,13 @@ makeTriangleStamp size rotation =
         link = makeTriangleLink shape
     in 
         {shape = shape, pattern = pattern, link = link}
+
+emptyStamp : Stamp
+emptyStamp = { 
+                shape = ngon 0 0,
+                pattern = [],
+                link = (\int point -> (0,(0,0)))
+             }
 
 drawPolygon : Polygon -> List Form
 drawPolygon shape = List.map ((traced (solid black)) << path) shape

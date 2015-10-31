@@ -2915,6 +2915,742 @@ Elm.Html.make = function (_elm) {
                       ,menu: menu};
    return _elm.Html.values;
 };
+Elm.Html = Elm.Html || {};
+Elm.Html.Attributes = Elm.Html.Attributes || {};
+Elm.Html.Attributes.make = function (_elm) {
+   "use strict";
+   _elm.Html = _elm.Html || {};
+   _elm.Html.Attributes = _elm.Html.Attributes || {};
+   if (_elm.Html.Attributes.values)
+   return _elm.Html.Attributes.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Html.Attributes",
+   $Basics = Elm.Basics.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $VirtualDom = Elm.VirtualDom.make(_elm);
+   var attribute = $VirtualDom.attribute;
+   var property = $VirtualDom.property;
+   var stringProperty = F2(function (name,
+   string) {
+      return A2(property,
+      name,
+      $Json$Encode.string(string));
+   });
+   var $class = function (name) {
+      return A2(stringProperty,
+      "className",
+      name);
+   };
+   var id = function (name) {
+      return A2(stringProperty,
+      "id",
+      name);
+   };
+   var title = function (name) {
+      return A2(stringProperty,
+      "title",
+      name);
+   };
+   var accesskey = function ($char) {
+      return A2(stringProperty,
+      "accesskey",
+      $String.fromList(_L.fromArray([$char])));
+   };
+   var contextmenu = function (value) {
+      return A2(stringProperty,
+      "contextmenu",
+      value);
+   };
+   var dir = function (value) {
+      return A2(stringProperty,
+      "dir",
+      value);
+   };
+   var draggable = function (value) {
+      return A2(stringProperty,
+      "draggable",
+      value);
+   };
+   var dropzone = function (value) {
+      return A2(stringProperty,
+      "dropzone",
+      value);
+   };
+   var itemprop = function (value) {
+      return A2(stringProperty,
+      "itemprop",
+      value);
+   };
+   var lang = function (value) {
+      return A2(stringProperty,
+      "lang",
+      value);
+   };
+   var tabindex = function (n) {
+      return A2(stringProperty,
+      "tabIndex",
+      $Basics.toString(n));
+   };
+   var charset = function (value) {
+      return A2(stringProperty,
+      "charset",
+      value);
+   };
+   var content = function (value) {
+      return A2(stringProperty,
+      "content",
+      value);
+   };
+   var httpEquiv = function (value) {
+      return A2(stringProperty,
+      "httpEquiv",
+      value);
+   };
+   var language = function (value) {
+      return A2(stringProperty,
+      "language",
+      value);
+   };
+   var src = function (value) {
+      return A2(stringProperty,
+      "src",
+      value);
+   };
+   var height = function (value) {
+      return A2(stringProperty,
+      "height",
+      $Basics.toString(value));
+   };
+   var width = function (value) {
+      return A2(stringProperty,
+      "width",
+      $Basics.toString(value));
+   };
+   var alt = function (value) {
+      return A2(stringProperty,
+      "alt",
+      value);
+   };
+   var preload = function (value) {
+      return A2(stringProperty,
+      "preload",
+      value);
+   };
+   var poster = function (value) {
+      return A2(stringProperty,
+      "poster",
+      value);
+   };
+   var kind = function (value) {
+      return A2(stringProperty,
+      "kind",
+      value);
+   };
+   var srclang = function (value) {
+      return A2(stringProperty,
+      "srclang",
+      value);
+   };
+   var sandbox = function (value) {
+      return A2(stringProperty,
+      "sandbox",
+      value);
+   };
+   var srcdoc = function (value) {
+      return A2(stringProperty,
+      "srcdoc",
+      value);
+   };
+   var type$ = function (value) {
+      return A2(stringProperty,
+      "type",
+      value);
+   };
+   var value = function (value) {
+      return A2(stringProperty,
+      "value",
+      value);
+   };
+   var placeholder = function (value) {
+      return A2(stringProperty,
+      "placeholder",
+      value);
+   };
+   var accept = function (value) {
+      return A2(stringProperty,
+      "accept",
+      value);
+   };
+   var acceptCharset = function (value) {
+      return A2(stringProperty,
+      "acceptCharset",
+      value);
+   };
+   var action = function (value) {
+      return A2(stringProperty,
+      "action",
+      value);
+   };
+   var autocomplete = function (bool) {
+      return A2(stringProperty,
+      "autocomplete",
+      bool ? "on" : "off");
+   };
+   var autosave = function (value) {
+      return A2(stringProperty,
+      "autosave",
+      value);
+   };
+   var enctype = function (value) {
+      return A2(stringProperty,
+      "enctype",
+      value);
+   };
+   var formaction = function (value) {
+      return A2(stringProperty,
+      "formaction",
+      value);
+   };
+   var list = function (value) {
+      return A2(stringProperty,
+      "list",
+      value);
+   };
+   var minlength = function (n) {
+      return A2(stringProperty,
+      "minLength",
+      $Basics.toString(n));
+   };
+   var maxlength = function (n) {
+      return A2(stringProperty,
+      "maxLength",
+      $Basics.toString(n));
+   };
+   var method = function (value) {
+      return A2(stringProperty,
+      "method",
+      value);
+   };
+   var name = function (value) {
+      return A2(stringProperty,
+      "name",
+      value);
+   };
+   var pattern = function (value) {
+      return A2(stringProperty,
+      "pattern",
+      value);
+   };
+   var size = function (n) {
+      return A2(stringProperty,
+      "size",
+      $Basics.toString(n));
+   };
+   var $for = function (value) {
+      return A2(stringProperty,
+      "htmlFor",
+      value);
+   };
+   var form = function (value) {
+      return A2(stringProperty,
+      "form",
+      value);
+   };
+   var max = function (value) {
+      return A2(stringProperty,
+      "max",
+      value);
+   };
+   var min = function (value) {
+      return A2(stringProperty,
+      "min",
+      value);
+   };
+   var step = function (n) {
+      return A2(stringProperty,
+      "step",
+      n);
+   };
+   var cols = function (n) {
+      return A2(stringProperty,
+      "cols",
+      $Basics.toString(n));
+   };
+   var rows = function (n) {
+      return A2(stringProperty,
+      "rows",
+      $Basics.toString(n));
+   };
+   var wrap = function (value) {
+      return A2(stringProperty,
+      "wrap",
+      value);
+   };
+   var usemap = function (value) {
+      return A2(stringProperty,
+      "useMap",
+      value);
+   };
+   var shape = function (value) {
+      return A2(stringProperty,
+      "shape",
+      value);
+   };
+   var coords = function (value) {
+      return A2(stringProperty,
+      "coords",
+      value);
+   };
+   var challenge = function (value) {
+      return A2(stringProperty,
+      "challenge",
+      value);
+   };
+   var keytype = function (value) {
+      return A2(stringProperty,
+      "keytype",
+      value);
+   };
+   var align = function (value) {
+      return A2(stringProperty,
+      "align",
+      value);
+   };
+   var cite = function (value) {
+      return A2(stringProperty,
+      "cite",
+      value);
+   };
+   var href = function (value) {
+      return A2(stringProperty,
+      "href",
+      value);
+   };
+   var target = function (value) {
+      return A2(stringProperty,
+      "target",
+      value);
+   };
+   var downloadAs = function (value) {
+      return A2(stringProperty,
+      "download",
+      value);
+   };
+   var hreflang = function (value) {
+      return A2(stringProperty,
+      "hreflang",
+      value);
+   };
+   var media = function (value) {
+      return A2(stringProperty,
+      "media",
+      value);
+   };
+   var ping = function (value) {
+      return A2(stringProperty,
+      "ping",
+      value);
+   };
+   var rel = function (value) {
+      return A2(stringProperty,
+      "rel",
+      value);
+   };
+   var datetime = function (value) {
+      return A2(stringProperty,
+      "datetime",
+      value);
+   };
+   var pubdate = function (value) {
+      return A2(stringProperty,
+      "pubdate",
+      value);
+   };
+   var start = function (n) {
+      return A2(stringProperty,
+      "start",
+      $Basics.toString(n));
+   };
+   var colspan = function (n) {
+      return A2(stringProperty,
+      "colSpan",
+      $Basics.toString(n));
+   };
+   var headers = function (value) {
+      return A2(stringProperty,
+      "headers",
+      value);
+   };
+   var rowspan = function (n) {
+      return A2(stringProperty,
+      "rowSpan",
+      $Basics.toString(n));
+   };
+   var scope = function (value) {
+      return A2(stringProperty,
+      "scope",
+      value);
+   };
+   var manifest = function (value) {
+      return A2(stringProperty,
+      "manifest",
+      value);
+   };
+   var boolProperty = F2(function (name,
+   bool) {
+      return A2(property,
+      name,
+      $Json$Encode.bool(bool));
+   });
+   var hidden = function (bool) {
+      return A2(boolProperty,
+      "hidden",
+      bool);
+   };
+   var contenteditable = function (bool) {
+      return A2(boolProperty,
+      "contentEditable",
+      bool);
+   };
+   var spellcheck = function (bool) {
+      return A2(boolProperty,
+      "spellcheck",
+      bool);
+   };
+   var async = function (bool) {
+      return A2(boolProperty,
+      "async",
+      bool);
+   };
+   var defer = function (bool) {
+      return A2(boolProperty,
+      "defer",
+      bool);
+   };
+   var scoped = function (bool) {
+      return A2(boolProperty,
+      "scoped",
+      bool);
+   };
+   var autoplay = function (bool) {
+      return A2(boolProperty,
+      "autoplay",
+      bool);
+   };
+   var controls = function (bool) {
+      return A2(boolProperty,
+      "controls",
+      bool);
+   };
+   var loop = function (bool) {
+      return A2(boolProperty,
+      "loop",
+      bool);
+   };
+   var $default = function (bool) {
+      return A2(boolProperty,
+      "default",
+      bool);
+   };
+   var seamless = function (bool) {
+      return A2(boolProperty,
+      "seamless",
+      bool);
+   };
+   var checked = function (bool) {
+      return A2(boolProperty,
+      "checked",
+      bool);
+   };
+   var selected = function (bool) {
+      return A2(boolProperty,
+      "selected",
+      bool);
+   };
+   var autofocus = function (bool) {
+      return A2(boolProperty,
+      "autofocus",
+      bool);
+   };
+   var disabled = function (bool) {
+      return A2(boolProperty,
+      "disabled",
+      bool);
+   };
+   var multiple = function (bool) {
+      return A2(boolProperty,
+      "multiple",
+      bool);
+   };
+   var novalidate = function (bool) {
+      return A2(boolProperty,
+      "noValidate",
+      bool);
+   };
+   var readonly = function (bool) {
+      return A2(boolProperty,
+      "readOnly",
+      bool);
+   };
+   var required = function (bool) {
+      return A2(boolProperty,
+      "required",
+      bool);
+   };
+   var ismap = function (value) {
+      return A2(boolProperty,
+      "isMap",
+      value);
+   };
+   var download = function (bool) {
+      return A2(boolProperty,
+      "download",
+      bool);
+   };
+   var reversed = function (bool) {
+      return A2(boolProperty,
+      "reversed",
+      bool);
+   };
+   var classList = function (list) {
+      return $class($String.join(" ")($List.map($Basics.fst)($List.filter($Basics.snd)(list))));
+   };
+   var style = function (props) {
+      return property("style")($Json$Encode.object($List.map(function (_v0) {
+         return function () {
+            switch (_v0.ctor)
+            {case "_Tuple2":
+               return {ctor: "_Tuple2"
+                      ,_0: _v0._0
+                      ,_1: $Json$Encode.string(_v0._1)};}
+            _U.badCase($moduleName,
+            "on line 156, column 35 to 57");
+         }();
+      })(props)));
+   };
+   var key = function (k) {
+      return A2(stringProperty,
+      "key",
+      k);
+   };
+   _elm.Html.Attributes.values = {_op: _op
+                                 ,key: key
+                                 ,style: style
+                                 ,$class: $class
+                                 ,classList: classList
+                                 ,id: id
+                                 ,title: title
+                                 ,hidden: hidden
+                                 ,type$: type$
+                                 ,value: value
+                                 ,checked: checked
+                                 ,placeholder: placeholder
+                                 ,selected: selected
+                                 ,accept: accept
+                                 ,acceptCharset: acceptCharset
+                                 ,action: action
+                                 ,autocomplete: autocomplete
+                                 ,autofocus: autofocus
+                                 ,autosave: autosave
+                                 ,disabled: disabled
+                                 ,enctype: enctype
+                                 ,formaction: formaction
+                                 ,list: list
+                                 ,maxlength: maxlength
+                                 ,minlength: minlength
+                                 ,method: method
+                                 ,multiple: multiple
+                                 ,name: name
+                                 ,novalidate: novalidate
+                                 ,pattern: pattern
+                                 ,readonly: readonly
+                                 ,required: required
+                                 ,size: size
+                                 ,$for: $for
+                                 ,form: form
+                                 ,max: max
+                                 ,min: min
+                                 ,step: step
+                                 ,cols: cols
+                                 ,rows: rows
+                                 ,wrap: wrap
+                                 ,href: href
+                                 ,target: target
+                                 ,download: download
+                                 ,downloadAs: downloadAs
+                                 ,hreflang: hreflang
+                                 ,media: media
+                                 ,ping: ping
+                                 ,rel: rel
+                                 ,ismap: ismap
+                                 ,usemap: usemap
+                                 ,shape: shape
+                                 ,coords: coords
+                                 ,src: src
+                                 ,height: height
+                                 ,width: width
+                                 ,alt: alt
+                                 ,autoplay: autoplay
+                                 ,controls: controls
+                                 ,loop: loop
+                                 ,preload: preload
+                                 ,poster: poster
+                                 ,$default: $default
+                                 ,kind: kind
+                                 ,srclang: srclang
+                                 ,sandbox: sandbox
+                                 ,seamless: seamless
+                                 ,srcdoc: srcdoc
+                                 ,reversed: reversed
+                                 ,start: start
+                                 ,align: align
+                                 ,colspan: colspan
+                                 ,rowspan: rowspan
+                                 ,headers: headers
+                                 ,scope: scope
+                                 ,async: async
+                                 ,charset: charset
+                                 ,content: content
+                                 ,defer: defer
+                                 ,httpEquiv: httpEquiv
+                                 ,language: language
+                                 ,scoped: scoped
+                                 ,accesskey: accesskey
+                                 ,contenteditable: contenteditable
+                                 ,contextmenu: contextmenu
+                                 ,dir: dir
+                                 ,draggable: draggable
+                                 ,dropzone: dropzone
+                                 ,itemprop: itemprop
+                                 ,lang: lang
+                                 ,spellcheck: spellcheck
+                                 ,tabindex: tabindex
+                                 ,challenge: challenge
+                                 ,keytype: keytype
+                                 ,cite: cite
+                                 ,datetime: datetime
+                                 ,pubdate: pubdate
+                                 ,manifest: manifest
+                                 ,property: property
+                                 ,attribute: attribute};
+   return _elm.Html.Attributes.values;
+};
+Elm.Html = Elm.Html || {};
+Elm.Html.Events = Elm.Html.Events || {};
+Elm.Html.Events.make = function (_elm) {
+   "use strict";
+   _elm.Html = _elm.Html || {};
+   _elm.Html.Events = _elm.Html.Events || {};
+   if (_elm.Html.Events.values)
+   return _elm.Html.Events.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Html.Events",
+   $Basics = Elm.Basics.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $VirtualDom = Elm.VirtualDom.make(_elm);
+   var keyCode = A2($Json$Decode._op[":="],
+   "keyCode",
+   $Json$Decode.$int);
+   var targetChecked = A2($Json$Decode.at,
+   _L.fromArray(["target"
+                ,"checked"]),
+   $Json$Decode.bool);
+   var targetValue = A2($Json$Decode.at,
+   _L.fromArray(["target"
+                ,"value"]),
+   $Json$Decode.string);
+   var defaultOptions = $VirtualDom.defaultOptions;
+   var Options = F2(function (a,
+   b) {
+      return {_: {}
+             ,preventDefault: b
+             ,stopPropagation: a};
+   });
+   var onWithOptions = $VirtualDom.onWithOptions;
+   var on = $VirtualDom.on;
+   var messageOn = F3(function (name,
+   addr,
+   msg) {
+      return A3(on,
+      name,
+      $Json$Decode.value,
+      function (_v0) {
+         return function () {
+            return A2($Signal.message,
+            addr,
+            msg);
+         }();
+      });
+   });
+   var onClick = messageOn("click");
+   var onDoubleClick = messageOn("dblclick");
+   var onMouseMove = messageOn("mousemove");
+   var onMouseDown = messageOn("mousedown");
+   var onMouseUp = messageOn("mouseup");
+   var onMouseEnter = messageOn("mouseenter");
+   var onMouseLeave = messageOn("mouseleave");
+   var onMouseOver = messageOn("mouseover");
+   var onMouseOut = messageOn("mouseout");
+   var onBlur = messageOn("blur");
+   var onFocus = messageOn("focus");
+   var onSubmit = messageOn("submit");
+   var onKey = F3(function (name,
+   addr,
+   handler) {
+      return A3(on,
+      name,
+      keyCode,
+      function (code) {
+         return A2($Signal.message,
+         addr,
+         handler(code));
+      });
+   });
+   var onKeyUp = onKey("keyup");
+   var onKeyDown = onKey("keydown");
+   var onKeyPress = onKey("keypress");
+   _elm.Html.Events.values = {_op: _op
+                             ,onBlur: onBlur
+                             ,onFocus: onFocus
+                             ,onSubmit: onSubmit
+                             ,onKeyUp: onKeyUp
+                             ,onKeyDown: onKeyDown
+                             ,onKeyPress: onKeyPress
+                             ,onClick: onClick
+                             ,onDoubleClick: onDoubleClick
+                             ,onMouseMove: onMouseMove
+                             ,onMouseDown: onMouseDown
+                             ,onMouseUp: onMouseUp
+                             ,onMouseEnter: onMouseEnter
+                             ,onMouseLeave: onMouseLeave
+                             ,onMouseOver: onMouseOver
+                             ,onMouseOut: onMouseOut
+                             ,on: on
+                             ,onWithOptions: onWithOptions
+                             ,defaultOptions: defaultOptions
+                             ,targetValue: targetValue
+                             ,targetChecked: targetChecked
+                             ,keyCode: keyCode
+                             ,Options: Options};
+   return _elm.Html.Events.values;
+};
 Elm.Json = Elm.Json || {};
 Elm.Json.Decode = Elm.Json.Decode || {};
 Elm.Json.Decode.make = function (_elm) {
@@ -3430,8 +4166,11 @@ Elm.Main.make = function (_elm) {
    _L = _N.List.make(_elm),
    $moduleName = "Main",
    $Basics = Elm.Basics.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
@@ -3439,7 +4178,7 @@ Elm.Main.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Stamps = Elm.Stamps.make(_elm),
    $Util = Elm.Util.make(_elm);
-   var drawModel = function (model) {
+   var drawTesselation = function (model) {
       return A2($Html.div,
       _L.fromArray([]),
       _L.fromArray([$Html.fromElement($Graphics$Element.layers(_L.fromArray([$Stamps.drawAll(model.stamp)
@@ -3451,14 +4190,20 @@ Elm.Main.make = function (_elm) {
                ,lastPoint: {ctor: "_Tuple2"
                            ,_0: 0
                            ,_1: 0}
-               ,stamp: A2($Stamps.makeHex2Stamp,
-               50,
-               0)};
+               ,pattern: -1
+               ,shape: ""
+               ,stamp: $Stamps.emptyStamp};
    var toCollageCoords = F2(function (x,
    y) {
       return {ctor: "_Tuple2"
              ,_0: $Basics.toFloat(x - ($Stamps.width / 2 | 0))
              ,_1: $Basics.toFloat(($Stamps.height / 2 | 0) - y)};
+   });
+   var replaceStamp = F2(function (stamp,
+   model) {
+      return _U.replace([["stamp"
+                         ,stamp]],
+      model);
    });
    var addDebug = F2(function (msg,
    model) {
@@ -3466,6 +4211,27 @@ Elm.Main.make = function (_elm) {
                          ,msg]],
       model);
    });
+   var stampDict = $Dict.fromList(_L.fromArray([{ctor: "_Tuple2"
+                                                ,_0: "Triangle"
+                                                ,_1: _L.fromArray([A2($Stamps.makeTriangleStamp,
+                                                100,
+                                                0)])}
+                                               ,{ctor: "_Tuple2"
+                                                ,_0: "Square"
+                                                ,_1: _L.fromArray([A2($Stamps.makeSquareStamp,
+                                                                  70,
+                                                                  0)
+                                                                  ,A2($Stamps.makeSquare2Stamp,
+                                                                  70,
+                                                                  0)])}
+                                               ,{ctor: "_Tuple2"
+                                                ,_0: "Hexagon"
+                                                ,_1: _L.fromArray([A2($Stamps.makeHexStamp,
+                                                                  50,
+                                                                  0)
+                                                                  ,A2($Stamps.makeHex2Stamp,
+                                                                  50,
+                                                                  0)])}]));
    var updateLastPoint = F3(function (x,
    y,
    model) {
@@ -3493,7 +4259,7 @@ Elm.Main.make = function (_elm) {
             switch (_v0.ctor)
             {case "Just": return _v0._0;}
             _U.badCase($moduleName,
-            "on line 56, column 29 to 73");
+            "on line 64, column 29 to 73");
          }(),
          squareDists);
          return _U.eq(index,
@@ -3522,7 +4288,7 @@ Elm.Main.make = function (_elm) {
             switch (_v2.ctor)
             {case "Just": return _v2._0;}
             _U.badCase($moduleName,
-            "on line 48, column 34 to 81");
+            "on line 56, column 34 to 81");
          }(),
          squareDistSums);
          return A2($Basics._op["++"],
@@ -3592,12 +4358,12 @@ Elm.Main.make = function (_elm) {
                                    ,_1: _v4._1}) : distFromLine;
                                 }();}
                            _U.badCase($moduleName,
-                           "between lines 16 and 27");
+                           "between lines 24 and 35");
                         }();}
                    break;}
               break;}
          _U.badCase($moduleName,
-         "between lines 16 and 27");
+         "between lines 24 and 35");
       }();
    });
    var getClosestSide = F2(function (_v16,
@@ -3625,7 +4391,7 @@ Elm.Main.make = function (_elm) {
                                           switch (_v28.ctor)
                                           {case "Just": return _v28._0;}
                                           _U.badCase($moduleName,
-                                          "on line 36, column 49 to 83");
+                                          "on line 44, column 49 to 83");
                                        }()
                                        ,_1: $Util.end(_v20._1)});
                                        return _U.cmp(currDist,
@@ -3636,10 +4402,10 @@ Elm.Main.make = function (_elm) {
                                                                        ,_1: _v21._1};
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 36 and 39");
+                               "between lines 44 and 47");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 36 and 39");
+                       "between lines 44 and 47");
                     }();
                  });
                  var indexedSides = A2($List.indexedMap,
@@ -3653,11 +4419,11 @@ Elm.Main.make = function (_elm) {
                  indexedClosest,
                  {ctor: "_Tuple2"
                  ,_0: 0
-                 ,_1: $Stamps.largeNumber},
+                 ,_1: $Util.largeNumber},
                  indexedSides));
               }();}
          _U.badCase($moduleName,
-         "between lines 32 and 41");
+         "between lines 40 and 49");
       }();
    });
    var updateStamp = F3(function (point,
@@ -3691,9 +4457,7 @@ Elm.Main.make = function (_elm) {
       return function () {
          switch (action.ctor)
          {case "Drag":
-            return addDebug($Basics.toString($Stamps.adjacent(A2($Stamps.ngon,
-              4,
-              10))))(A2(updateLastPoint,
+            return A2(updateLastPoint,
               action._0,
               action._1)(_U.eq(model.lastPoint,
               {ctor: "_Tuple2"
@@ -3712,17 +4476,130 @@ Elm.Main.make = function (_elm) {
                                    action._1),
                                    replacePointInSide,
                                    model.stamp)]],
-              model)));
+              model));
             case "MoveMouse":
             return A3(updateLastPoint,
               action._0,
               action._1,
               model);
-            case "None": return model;}
+            case "None": return model;
+            case "SelectPattern":
+            return A2(replaceStamp,
+              $Util.get(action._0)(function () {
+                 var _v37 = A2($Dict.get,
+                 model.shape,
+                 stampDict);
+                 switch (_v37.ctor)
+                 {case "Just": return _v37._0;}
+                 _U.badCase($moduleName,
+                 "on line 109, column 63 to 113");
+              }()),
+              _U.replace([["pattern"
+                          ,action._0]],
+              model));
+            case "SelectShape":
+            return _U.replace([["shape"
+                               ,action._0]],
+              model);}
          return model;
       }();
    });
+   var Model = F6(function (a,
+   b,
+   c,
+   d,
+   e,
+   f) {
+      return {_: {}
+             ,debug: f
+             ,editing: b
+             ,lastPoint: c
+             ,pattern: e
+             ,shape: d
+             ,stamp: a};
+   });
    var None = {ctor: "None"};
+   var shapeSelectMailbox = $Signal.mailbox(None);
+   var patternSelectMailbox = $Signal.mailbox(None);
+   var SelectPattern = function (a) {
+      return {ctor: "SelectPattern"
+             ,_0: a};
+   };
+   var SelectShape = function (a) {
+      return {ctor: "SelectShape"
+             ,_0: a};
+   };
+   var drawSelectors = F3(function (shapeAddress,
+   patternAddress,
+   model) {
+      return function () {
+         var formatSelected = F2(function (option,
+         selected) {
+            return _U.eq(option,
+            selected) ? A2($Html.b,
+            _L.fromArray([]),
+            _L.fromArray([$Html.text(option)])) : $Html.text(option);
+         });
+         return A2($Html.div,
+         _L.fromArray([]),
+         _L.fromArray([A2($Html.div,
+                      _L.fromArray([$Html$Attributes.id("shape-select")]),
+                      _L.fromArray([A2($Html.button,
+                                   _L.fromArray([A2($Html$Events.onClick,
+                                   shapeAddress,
+                                   SelectShape("Triangle"))]),
+                                   _L.fromArray([A2(formatSelected,
+                                   "Triangle",
+                                   model.shape)]))
+                                   ,A2($Html.button,
+                                   _L.fromArray([A2($Html$Events.onClick,
+                                   shapeAddress,
+                                   SelectShape("Square"))]),
+                                   _L.fromArray([A2(formatSelected,
+                                   "Square",
+                                   model.shape)]))
+                                   ,A2($Html.button,
+                                   _L.fromArray([A2($Html$Events.onClick,
+                                   shapeAddress,
+                                   SelectShape("Hexagon"))]),
+                                   _L.fromArray([A2(formatSelected,
+                                   "Hexagon",
+                                   model.shape)]))]))
+                      ,!_U.eq(model.shape,
+                      "") ? $Html.div(_L.fromArray([]))(A2($List.indexedMap,
+                      F2(function (i,stamp) {
+                         return A2($Html.button,
+                         _L.fromArray([A2($Html$Events.onClick,
+                         patternAddress,
+                         SelectPattern(i))]),
+                         _L.fromArray([A2(formatSelected,
+                         $Basics.toString(i),
+                         $Basics.toString(model.pattern))]));
+                      }),
+                      function () {
+                         var _v39 = A2($Dict.get,
+                         model.shape,
+                         stampDict);
+                         switch (_v39.ctor)
+                         {case "Just": return _v39._0;}
+                         _U.badCase($moduleName,
+                         "on line 174, column 34 to 84");
+                      }())) : A2($Html.div,
+                      _L.fromArray([]),
+                      _L.fromArray([]))]));
+      }();
+   });
+   var drawPage = F3(function (shapeAddress,
+   patternAddress,
+   model) {
+      return A2($Html.div,
+      _L.fromArray([]),
+      _L.fromArray([drawTesselation(model)
+                   ,A3(drawSelectors,
+                   shapeAddress,
+                   patternAddress,
+                   model)]));
+   });
    var MoveMouse = F2(function (a,
    b) {
       return {ctor: "MoveMouse"
@@ -3735,29 +4612,35 @@ Elm.Main.make = function (_elm) {
              ,_1: b};
    });
    var mouseSignal = A3($Signal.map2,
-   F2(function (isDown,_v35) {
+   F2(function (isDown,_v41) {
       return function () {
-         switch (_v35.ctor)
+         switch (_v41.ctor)
          {case "_Tuple2":
             return isDown ? A2(Drag,
-              _v35._0,
-              _v35._1) : A2(MoveMouse,
-              _v35._0,
-              _v35._1);}
+              _v41._0,
+              _v41._1) : A2(MoveMouse,
+              _v41._0,
+              _v41._1);}
          _U.badCase($moduleName,
-         "on line 127, column 45 to 87");
+         "on line 188, column 45 to 87");
       }();
    }),
    $Mouse.isDown,
    $Mouse.position);
-   var main = $Signal.map(drawModel)(A3($Signal.foldp,
+   var main = $Signal.map(A2(drawPage,
+   shapeSelectMailbox.address,
+   patternSelectMailbox.address))(A2($Signal.foldp,
    update,
-   model,
-   mouseSignal));
+   model)($Signal.mergeMany(_L.fromArray([mouseSignal
+                                         ,shapeSelectMailbox.signal
+                                         ,patternSelectMailbox.signal]))));
    _elm.Main.values = {_op: _op
                       ,Drag: Drag
                       ,MoveMouse: MoveMouse
+                      ,SelectShape: SelectShape
+                      ,SelectPattern: SelectPattern
                       ,None: None
+                      ,Model: Model
                       ,distPointEdge: distPointEdge
                       ,getClosestSide: getClosestSide
                       ,insertPointInSide: insertPointInSide
@@ -3766,10 +4649,16 @@ Elm.Main.make = function (_elm) {
                       ,updateStamp: updateStamp
                       ,updateLastPoint: updateLastPoint
                       ,update: update
+                      ,stampDict: stampDict
                       ,addDebug: addDebug
+                      ,replaceStamp: replaceStamp
                       ,toCollageCoords: toCollageCoords
                       ,model: model
-                      ,drawModel: drawModel
+                      ,drawTesselation: drawTesselation
+                      ,drawSelectors: drawSelectors
+                      ,drawPage: drawPage
+                      ,shapeSelectMailbox: shapeSelectMailbox
+                      ,patternSelectMailbox: patternSelectMailbox
                       ,mouseSignal: mouseSignal
                       ,main: main};
    return _elm.Main.values;
@@ -12071,7 +12960,7 @@ Elm.Stamps.make = function (_elm) {
                switch (_v0.ctor)
                {case "_Tuple3": return _v0._2;}
                _U.badCase($moduleName,
-               "on line 213, column 33 to 34");
+               "on line 211, column 33 to 34");
             }();
          };
          var dir = function (_v5) {
@@ -12079,7 +12968,7 @@ Elm.Stamps.make = function (_elm) {
                switch (_v5.ctor)
                {case "_Tuple3": return _v5._1;}
                _U.badCase($moduleName,
-               "on line 212, column 28 to 29");
+               "on line 210, column 28 to 29");
             }();
          };
          var origin = function (_v10) {
@@ -12088,7 +12977,7 @@ Elm.Stamps.make = function (_elm) {
                {case "_Tuple3":
                   return _v10._0;}
                _U.badCase($moduleName,
-               "on line 211, column 31 to 32");
+               "on line 209, column 31 to 32");
             }();
          };
          var form = $Graphics$Collage.group(A2($List.map,
@@ -12188,54 +13077,50 @@ Elm.Stamps.make = function (_elm) {
          return innerFunction;
       }();
    };
-   var opposite = F2(function (n,
-   d) {
+   var opposite = function (shape) {
       return function () {
-         var initAngle = $Basics.pi / 2;
-         var angle = 2 * $Basics.pi / $Basics.toFloat(n);
+         var n = $List.length(shape);
          var innerFunction = F2(function (side,
-         _v15) {
+         p) {
             return function () {
-               switch (_v15.ctor)
-               {case "_Tuple2":
-                  return function () {
-                       var angle$ = $Basics.toFloat(side) * angle + initAngle;
-                       return {ctor: "_Tuple2"
-                              ,_0: A2($Basics._op["%"],
-                              side + (n / 2 | 0),
-                              n)
-                              ,_1: {ctor: "_Tuple2"
-                                   ,_0: _v15._0 + d * $Basics.cos(angle$)
-                                   ,_1: _v15._1 + d * $Basics.sin(angle$)}};
-                    }();}
-               _U.badCase($moduleName,
-               "between lines 113 and 114");
+               var $ = $Util.sideToEdge(A2($Util.get,
+               side,
+               shape)),
+               s = $._0,
+               e = $._1;
+               var side$ = A2($Basics._op["%"],
+               side + (n / 2 | 0),
+               n);
+               var $ = $Util.sideToEdge(A2($Util.get,
+               side$,
+               shape)),
+               s$ = $._0,
+               e$ = $._1;
+               return {ctor: "_Tuple2"
+                      ,_0: side$
+                      ,_1: A2($Util.fromRelativeCoords,
+                      A2($Util.toRelativeCoords,
+                      p,
+                      {ctor: "_Tuple2",_0: s,_1: e}),
+                      {ctor: "_Tuple2"
+                      ,_0: e$
+                      ,_1: s$})};
             }();
          });
          return innerFunction;
       }();
-   });
-   var makeHexLink = function (size) {
-      return A2(opposite,
-      6,
-      $Basics.sqrt(2 * Math.pow(size,
-      2) * (1 - $Basics.cos($Util.exteriorAngle(6)))));
    };
-   var makeSquareLink = function (size) {
-      return A2(opposite,4,size);
-   };
-   var largeNumber = 999999999;
    var makePoint = F3(function (dist,
    angle,
-   _v19) {
+   _v15) {
       return function () {
-         switch (_v19.ctor)
+         switch (_v15.ctor)
          {case "_Tuple2":
             return function () {
                  var dir = $Util.rem2pi(angle);
                  return {ctor: "_Tuple2"
-                        ,_0: _v19._0 + dist * $Basics.cos(dir)
-                        ,_1: _v19._1 + dist * $Basics.sin(dir)};
+                        ,_0: _v15._0 + dist * $Basics.cos(dir)
+                        ,_1: _v15._1 + dist * $Basics.sin(dir)};
               }();}
          _U.badCase($moduleName,
          "between lines 16 and 18");
@@ -12243,22 +13128,22 @@ Elm.Stamps.make = function (_elm) {
    });
    var makeEdge = F3(function (len,
    angle,
-   _v23) {
+   _v19) {
       return function () {
-         switch (_v23.ctor)
+         switch (_v19.ctor)
          {case "_Tuple2":
-            switch (_v23._1.ctor)
+            switch (_v19._1.ctor)
               {case "_Tuple2":
                  return {ctor: "_Tuple2"
                         ,_0: {ctor: "_Tuple2"
-                             ,_0: _v23._1._0
-                             ,_1: _v23._1._1}
+                             ,_0: _v19._1._0
+                             ,_1: _v19._1._1}
                         ,_1: A3(makePoint,
                         len,
                         angle,
                         {ctor: "_Tuple2"
-                        ,_0: _v23._1._0
-                        ,_1: _v23._1._1})};}
+                        ,_0: _v19._1._0
+                        ,_1: _v19._1._1})};}
               break;}
          _U.badCase($moduleName,
          "on line 21, column 34 to 66");
@@ -12284,62 +13169,72 @@ Elm.Stamps.make = function (_elm) {
          $Basics.toFloat(n) - 1))));
       }();
    });
-   var hexagon = A2(ngon,6,50);
+   var emptyStamp = {_: {}
+                    ,link: F2(function ($int,
+                    point) {
+                       return {ctor: "_Tuple2"
+                              ,_0: 0
+                              ,_1: {ctor: "_Tuple2"
+                                   ,_0: 0
+                                   ,_1: 0}};
+                    })
+                    ,pattern: _L.fromArray([])
+                    ,shape: A2(ngon,0,0)};
    var height = 500;
    var width = 1000;
    var addNeighbors = F3(function (neighbors,
-   _v29,
+   _v25,
    points) {
       return function () {
-         switch (_v29.ctor)
+         switch (_v25.ctor)
          {case "::":
-            switch (_v29._0.ctor)
+            switch (_v25._0.ctor)
               {case "_Tuple3":
-                 switch (_v29._0._0.ctor)
+                 switch (_v25._0._0.ctor)
                    {case "_Tuple2":
                       return function () {
-                           var isSingleton = _U.eq(_v29._1,
+                           var isSingleton = _U.eq(_v25._1,
                            _L.fromArray([]));
-                           var dir$ = $Util.trunc(_v29._0._1);
-                           var y$ = $Util.trunc(_v29._0._0._1);
-                           var x$ = $Util.trunc(_v29._0._0._0);
+                           var dir$ = $Util.trunc(_v25._0._1);
+                           var y$ = $Util.trunc(_v25._0._0._1);
+                           var x$ = $Util.trunc(_v25._0._0._0);
                            var points$ = A2($Set.insert,
                            {ctor: "_Tuple3"
                            ,_0: {ctor: "_Tuple2"
                                 ,_0: x$
                                 ,_1: y$}
                            ,_1: dir$
-                           ,_2: _v29._0._2},
+                           ,_2: _v25._0._2},
                            points);
-                           var discard = _U.cmp($Basics.abs(_v29._0._0._0),
-                           width / 2) > 0 || (_U.cmp($Basics.abs(_v29._0._0._1),
+                           var discard = _U.cmp($Basics.abs(_v25._0._0._0),
+                           width / 2) > 0 || (_U.cmp($Basics.abs(_v25._0._0._1),
                            height / 2) > 0 || A2($Set.member,
                            {ctor: "_Tuple3"
                            ,_0: {ctor: "_Tuple2"
                                 ,_0: x$
                                 ,_1: y$}
                            ,_1: dir$
-                           ,_2: _v29._0._2},
+                           ,_2: _v25._0._2},
                            points));
                            return isSingleton && discard ? points : discard ? A3(addNeighbors,
                            neighbors,
-                           _v29._1,
+                           _v25._1,
                            points) : A3(addNeighbors,
                            neighbors,
                            A2($Basics._op["++"],
-                           _v29._1,
+                           _v25._1,
                            neighbors({ctor: "_Tuple3"
                                      ,_0: {ctor: "_Tuple2"
-                                          ,_0: _v29._0._0._0
-                                          ,_1: _v29._0._0._1}
-                                     ,_1: _v29._0._1
-                                     ,_2: _v29._0._2})),
+                                          ,_0: _v25._0._0._0
+                                          ,_1: _v25._0._0._1}
+                                     ,_1: _v25._0._1
+                                     ,_2: _v25._0._2})),
                            points$);
                         }();}
                    break;}
               break;}
          _U.badCase($moduleName,
-         "between lines 35 and 46");
+         "between lines 32 and 43");
       }();
    });
    var makeHexPattern = F2(function (sideLen,
@@ -12352,9 +13247,9 @@ Elm.Stamps.make = function (_elm) {
          _L.range(1,3));
          var chordLen = $Basics.sqrt(2 * Math.pow(sideLen,
          2) * (1 - $Basics.cos($Util.exteriorAngle(6))));
-         var neighbors = function (_v38) {
+         var neighbors = function (_v34) {
             return function () {
-               switch (_v38.ctor)
+               switch (_v34.ctor)
                {case "_Tuple3":
                   return A2($List.map,
                     function (x) {
@@ -12362,13 +13257,13 @@ Elm.Stamps.make = function (_elm) {
                               ,_0: A3(makePoint,
                               chordLen,
                               x,
-                              _v38._0)
+                              _v34._0)
                               ,_1: rotation
                               ,_2: 0};
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 57, column 34 to 101");
+               "on line 52, column 34 to 101");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12385,11 +13280,11 @@ Elm.Stamps.make = function (_elm) {
    var makeHexStamp = F2(function (size,
    rotation) {
       return function () {
-         var link = makeHexLink(size);
          var pattern = A2(makeHexPattern,
          size,
          rotation);
          var shape = A2(ngon,6,size);
+         var link = opposite(shape);
          return {_: {}
                 ,link: link
                 ,pattern: pattern
@@ -12406,9 +13301,9 @@ Elm.Stamps.make = function (_elm) {
          _L.range(1,3));
          var chordLen = $Basics.sqrt(2 * Math.pow(sideLen,
          2) * (1 - $Basics.cos($Util.exteriorAngle(6))));
-         var neighbors = function (_v43) {
+         var neighbors = function (_v39) {
             return function () {
-               switch (_v43.ctor)
+               switch (_v39.ctor)
                {case "_Tuple3":
                   return A2($List.map,
                     function (x) {
@@ -12417,17 +13312,17 @@ Elm.Stamps.make = function (_elm) {
                               chordLen,
                               x,
                               A2($Util._op[".+"],
-                              _v43._0,
+                              _v39._0,
                               A3(makePoint,
                               chordLen,
-                              _v43._1 + $Basics.pi / 6,
+                              _v39._1 + $Basics.pi / 6,
                               {ctor: "_Tuple2",_0: 0,_1: 0})))
-                              ,_1: $Util.rem2pi(rotation + _v43._1 + 2 * $Basics.pi / 3)
+                              ,_1: $Util.rem2pi(rotation + _v39._1 + 2 * $Basics.pi / 3)
                               ,_2: 0};
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 68, column 36 to 167");
+               "on line 63, column 36 to 167");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12463,9 +13358,9 @@ Elm.Stamps.make = function (_elm) {
             return $Basics.pi * x / 2 + rotation;
          },
          _L.range(1,4));
-         var neighbors = function (_v48) {
+         var neighbors = function (_v44) {
             return function () {
-               switch (_v48.ctor)
+               switch (_v44.ctor)
                {case "_Tuple3":
                   return A2($List.map,
                     function (x) {
@@ -12473,13 +13368,13 @@ Elm.Stamps.make = function (_elm) {
                               ,_0: A3(makePoint,
                               sideLen,
                               x,
-                              _v48._0)
+                              _v44._0)
                               ,_1: rotation
                               ,_2: 0};
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 80, column 34 to 100");
+               "on line 75, column 34 to 100");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12496,11 +13391,11 @@ Elm.Stamps.make = function (_elm) {
    var makeSquareStamp = F2(function (size,
    rotation) {
       return function () {
-         var link = makeSquareLink(size);
          var pattern = A2(makeSquarePattern,
          size,
          rotation);
          var shape = A2(ngon,4,size);
+         var link = opposite(shape);
          return {_: {}
                 ,link: link
                 ,pattern: pattern
@@ -12516,9 +13411,9 @@ Elm.Stamps.make = function (_elm) {
             return $Basics.pi * x / 2 + $Basics.pi / 4 + rotation;
          },
          _L.range(1,4));
-         var neighbors = function (_v53) {
+         var neighbors = function (_v49) {
             return function () {
-               switch (_v53.ctor)
+               switch (_v49.ctor)
                {case "_Tuple3":
                   return A2($List.map,
                     function (x) {
@@ -12527,17 +13422,17 @@ Elm.Stamps.make = function (_elm) {
                               chordLen,
                               x,
                               A2($Util._op[".+"],
-                              _v53._0,
+                              _v49._0,
                               A3(makePoint,
                               chordLen,
-                              _v53._1 + $Basics.pi / 4,
+                              _v49._1 + $Basics.pi / 4,
                               {ctor: "_Tuple2",_0: 0,_1: 0})))
-                              ,_1: $Util.rem2pi(_v53._1 + rotation + $Basics.pi)
+                              ,_1: $Util.rem2pi(_v49._1 + rotation + $Basics.pi)
                               ,_2: 0};
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 90, column 36 to 163");
+               "on line 85, column 36 to 163");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12568,27 +13463,27 @@ Elm.Stamps.make = function (_elm) {
    var makeTrianglePattern = F2(function (sideLen,
    rotation) {
       return function () {
-         var orient = function (_v58) {
+         var orient = function (_v54) {
             return function () {
-               switch (_v58.ctor)
+               switch (_v54.ctor)
                {case "::":
-                  switch (_v58._1.ctor)
+                  switch (_v54._1.ctor)
                     {case "::":
-                       switch (_v58._1._1.ctor)
+                       switch (_v54._1._1.ctor)
                          {case "::":
                             return _L.fromArray([{ctor: "_Tuple2"
-                                                 ,_0: _v58._0
+                                                 ,_0: _v54._0
                                                  ,_1: 1}
                                                 ,{ctor: "_Tuple2"
-                                                 ,_0: _v58._1._0
+                                                 ,_0: _v54._1._0
                                                  ,_1: 1}
                                                 ,{ctor: "_Tuple2"
-                                                 ,_0: _v58._1._1._0
+                                                 ,_0: _v54._1._1._0
                                                  ,_1: 0}]);}
                          break;}
                     break;}
                _U.badCase($moduleName,
-               "on line 100, column 31 to 52");
+               "on line 95, column 31 to 52");
             }();
          };
          var angles = A2($List.map,
@@ -12596,34 +13491,34 @@ Elm.Stamps.make = function (_elm) {
             return $Basics.pi * x * 2 / 3 + rotation;
          },
          _L.range(1,3));
-         var neighbors = function (_v66) {
+         var neighbors = function (_v62) {
             return function () {
-               switch (_v66.ctor)
+               switch (_v62.ctor)
                {case "_Tuple3":
-                  switch (_v66._0.ctor)
+                  switch (_v62._0.ctor)
                     {case "_Tuple2":
-                       return $List.map(function (_v73) {
+                       return $List.map(function (_v69) {
                             return function () {
-                               switch (_v73.ctor)
+                               switch (_v69.ctor)
                                {case "_Tuple2":
                                   return {ctor: "_Tuple3"
                                          ,_0: A3(makePoint,
                                          sideLen,
-                                         _v73._0,
+                                         _v69._0,
                                          {ctor: "_Tuple2"
-                                         ,_0: _v66._0._0
-                                         ,_1: _v66._0._1})
+                                         ,_0: _v62._0._0
+                                         ,_1: _v62._0._1})
                                          ,_1: rotation
                                          ,_2: A2($Basics._op["%"],
-                                         _v73._1 + _v66._2,
+                                         _v69._1 + _v62._2,
                                          2)};}
                                _U.badCase($moduleName,
-                               "on line 102, column 80 to 141");
+                               "on line 97, column 80 to 141");
                             }();
                          })(orient(angles));}
                     break;}
                _U.badCase($moduleName,
-               "on line 102, column 48 to 161");
+               "on line 97, column 48 to 161");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -12668,9 +13563,7 @@ Elm.Stamps.make = function (_elm) {
                         ,makePoint: makePoint
                         ,makeEdge: makeEdge
                         ,ngon: ngon
-                        ,hexagon: hexagon
                         ,addNeighbors: addNeighbors
-                        ,largeNumber: largeNumber
                         ,makeHexPattern: makeHexPattern
                         ,makeHex2Pattern: makeHex2Pattern
                         ,makeSquarePattern: makeSquarePattern
@@ -12678,14 +13571,13 @@ Elm.Stamps.make = function (_elm) {
                         ,makeTrianglePattern: makeTrianglePattern
                         ,opposite: opposite
                         ,adjacent: adjacent
-                        ,makeHexLink: makeHexLink
-                        ,makeSquareLink: makeSquareLink
                         ,makeTriangleLink: makeTriangleLink
                         ,makeHexStamp: makeHexStamp
                         ,makeHex2Stamp: makeHex2Stamp
                         ,makeSquareStamp: makeSquareStamp
                         ,makeSquare2Stamp: makeSquare2Stamp
                         ,makeTriangleStamp: makeTriangleStamp
+                        ,emptyStamp: emptyStamp
                         ,drawPolygon: drawPolygon
                         ,drawStamp: drawStamp
                         ,draw: draw
@@ -13218,7 +14110,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: _v0._0
                    ,_1: 0 - _v0._1};}
          _U.badCase($moduleName,
-         "on line 124, column 18 to 22");
+         "on line 122, column 18 to 22");
       }();
    };
    var perp = function (_v4) {
@@ -13229,7 +14121,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: _v4._1
                    ,_1: 0 - _v4._0};}
          _U.badCase($moduleName,
-         "on line 104, column 15 to 19");
+         "on line 102, column 15 to 19");
       }();
    };
    var mapBetween = F2(function (f,
@@ -13250,7 +14142,7 @@ Elm.Util.make = function (_elm) {
                    _v8._1._1)));}
               break;}
          _U.badCase($moduleName,
-         "between lines 96 and 98");
+         "between lines 94 and 96");
       }();
    });
    var getIndexOf = F2(function (a,
@@ -13262,7 +14154,7 @@ Elm.Util.make = function (_elm) {
               a,
               _v14._1);}
          _U.badCase($moduleName,
-         "between lines 91 and 93");
+         "between lines 89 and 91");
       }();
    });
    var get = F2(function (i,_v18) {
@@ -13273,7 +14165,7 @@ Elm.Util.make = function (_elm) {
               i - 1,
               _v18._1);}
          _U.badCase($moduleName,
-         "on line 88, column 17 to 51");
+         "on line 86, column 17 to 51");
       }();
    });
    var $delete = F2(function (i,
@@ -13297,7 +14189,7 @@ Elm.Util.make = function (_elm) {
          switch (_v22.ctor)
          {case "Just": return _v22._0;}
          _U.badCase($moduleName,
-         "on line 79, column 10 to 57");
+         "on line 77, column 10 to 57");
       }();
    };
    var dot = F2(function (_v24,
@@ -13310,10 +14202,10 @@ Elm.Util.make = function (_elm) {
                  {case "_Tuple2":
                     return _v24._0 * _v25._0 + _v24._1 * _v25._1;}
                  _U.badCase($moduleName,
-                 "on line 76, column 23 to 36");
+                 "on line 74, column 23 to 36");
               }();}
          _U.badCase($moduleName,
-         "on line 76, column 23 to 36");
+         "on line 74, column 23 to 36");
       }();
    });
    var mag = function (_v32) {
@@ -13323,7 +14215,7 @@ Elm.Util.make = function (_elm) {
             return $Basics.sqrt(Math.pow(_v32._0,
               2) + Math.pow(_v32._1,2));}
          _U.badCase($moduleName,
-         "on line 73, column 13 to 26");
+         "on line 71, column 13 to 26");
       }();
    };
    var proj = F2(function (v,r) {
@@ -13341,10 +14233,10 @@ Elm.Util.make = function (_elm) {
                            ,_0: _v36._0 - _v37._0
                            ,_1: _v36._1 - _v37._1};}
                  _U.badCase($moduleName,
-                 "on line 66, column 23 to 33");
+                 "on line 64, column 23 to 33");
               }();}
          _U.badCase($moduleName,
-         "on line 66, column 23 to 33");
+         "on line 64, column 23 to 33");
       }();
    });
    _op[".+"] = F2(function (_v44,
@@ -13359,10 +14251,10 @@ Elm.Util.make = function (_elm) {
                            ,_0: _v44._0 + _v45._0
                            ,_1: _v44._1 + _v45._1};}
                  _U.badCase($moduleName,
-                 "on line 62, column 23 to 33");
+                 "on line 60, column 23 to 33");
               }();}
          _U.badCase($moduleName,
-         "on line 62, column 23 to 33");
+         "on line 60, column 23 to 33");
       }();
    });
    _op[".*"] = F2(function (k,
@@ -13374,7 +14266,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: k * _v52._0
                    ,_1: k * _v52._1};}
          _U.badCase($moduleName,
-         "on line 58, column 17 to 25");
+         "on line 56, column 17 to 25");
       }();
    });
    _op["./"] = F2(function (_v56,
@@ -13386,7 +14278,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: _v56._0 / k
                    ,_1: _v56._1 / k};}
          _U.badCase($moduleName,
-         "on line 54, column 17 to 25");
+         "on line 52, column 17 to 25");
       }();
    });
    var unitize = function (v) {
@@ -13412,7 +14304,7 @@ Elm.Util.make = function (_elm) {
                         ,_1: A2(proj,se$,x)};
               }();}
          _U.badCase($moduleName,
-         "between lines 108 and 113");
+         "between lines 106 and 111");
       }();
    });
    var fromRelativeCoords = F2(function (_v64,
@@ -13435,10 +14327,10 @@ Elm.Util.make = function (_elm) {
                          A2(_op[".*"],_v64._1,se$)));
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 117 and 121");
+                 "between lines 115 and 119");
               }();}
          _U.badCase($moduleName,
-         "between lines 117 and 121");
+         "between lines 115 and 119");
       }();
    });
    var distSquared = F2(function (_v72,
@@ -13453,10 +14345,10 @@ Elm.Util.make = function (_elm) {
                       2) + Math.pow(_v72._1 - _v73._1,
                       2);}
                  _U.badCase($moduleName,
-                 "on line 48, column 32 to 52");
+                 "on line 46, column 32 to 52");
               }();}
          _U.badCase($moduleName,
-         "on line 48, column 32 to 52");
+         "on line 46, column 32 to 52");
       }();
    });
    var dist = F2(function (p1,p2) {
@@ -13493,7 +14385,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: _v80._0
                    ,_1: end(_v80._1)};}
          _U.badCase($moduleName,
-         "on line 30, column 23 to 32");
+         "on line 28, column 23 to 32");
       }();
    };
    var edgeToSide = function (_v84) {
@@ -13503,7 +14395,7 @@ Elm.Util.make = function (_elm) {
             return _L.fromArray([_v84._0
                                 ,_v84._1]);}
          _U.badCase($moduleName,
-         "on line 27, column 20 to 25");
+         "on line 25, column 20 to 25");
       }();
    };
    var odd = function (x) {
@@ -13512,16 +14404,7 @@ Elm.Util.make = function (_elm) {
       2),
       1);
    };
-   var Model = F4(function (a,
-   b,
-   c,
-   d) {
-      return {_: {}
-             ,debug: d
-             ,editing: b
-             ,lastPoint: c
-             ,stamp: a};
-   });
+   var largeNumber = 999999999;
    var Stamp = F3(function (a,
    b,
    c) {
@@ -13532,7 +14415,7 @@ Elm.Util.make = function (_elm) {
    });
    _elm.Util.values = {_op: _op
                       ,Stamp: Stamp
-                      ,Model: Model
+                      ,largeNumber: largeNumber
                       ,odd: odd
                       ,edgeToSide: edgeToSide
                       ,sideToEdge: sideToEdge

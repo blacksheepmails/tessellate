@@ -15,10 +15,8 @@ type alias Stamp = { shape : Polygon,
                      pattern : Pattern, 
                      link : Link }
 type alias Link = Int -> Point -> (Int, Point)
-type alias Model = { stamp : Stamp,
-                     editing : Bool,
-                     lastPoint: (Int,Int),
-                     debug : String }
+
+largeNumber = 999999999
 
 odd : Int -> Bool
 odd x = x%2==1
