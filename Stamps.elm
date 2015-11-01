@@ -88,8 +88,18 @@ makeSquare2Pattern sideLen rotation =
         chordLen = sideLen * sqrt(2)
         neighbors : (Point, Dir, Int) -> Pattern
         neighbors (origin,dir,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (dir+pi/4) (0,0) )), rem2pi (dir+rotation+pi), 0) ) angles
-
     in
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+
+makeSquare3Pattern: Float -> Float -> Pattern
+makeSquare3Pattern sideLen rotation =
+    let
+        angles = List.map (\x-> pi*x/2 + pi/4 + rotation) [1..4]
+        chordLen = sideLen * sqrt(2)
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,_,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (pi/4) (-sideLen,-sideLen) )), rotation, 0) ) angles
+    in
+        --neighbors ((0,0), rotation, 0)
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
 
 
@@ -115,6 +125,19 @@ opposite n d =
     in
         innerFunction
 
+--todo
+oppositeFlip : Int -> Float -> Link
+oppositeFlip n d = 
+    let
+        angle = 2 * pi / (toFloat n)
+        initAngle = pi/2
+        innerFunction : Link
+        innerFunction side (x,y) =
+            let angle' = (toFloat side) * angle + (initAngle)
+            in ( (side + n//2) % n, (x + d*(cos angle'), y + d*(sin angle')))
+    in
+        innerFunction
+
 adjacent : Polygon -> Link
 adjacent shape =
     let
@@ -126,6 +149,20 @@ adjacent shape =
                 (s,e) = sideToEdge <| get side shape
                 (s',e') = sideToEdge <| get side' shape
             in (side' , fromRelativeCoords (toRelativeCoords p (s,e)) (e',s') )
+    in
+        innerFunction
+
+adjacentFlip : Polygon -> Link
+adjacentFlip shape =
+    let
+        n = List.length shape
+        innerFunction : Link
+        innerFunction side p =
+            let 
+                side' = (if odd side then side+1 else side-1) % n
+                (s,e) = sideToEdge <| get side shape
+                (s',e') = sideToEdge <| get side' shape
+            in (side' , fromRelativeCoords (negateY (toRelativeCoords p (s,e))) (s',e') )
     in
         innerFunction
 
@@ -188,6 +225,24 @@ makeSquare2Stamp size rotation =
         shape = ngon 4 size
         pattern = makeSquare2Pattern size rotation
         link = adjacent shape
+    in
+        {shape = shape, pattern = pattern, link = link}
+
+makeSquare3Stamp : Float -> Float -> Stamp
+makeSquare3Stamp size rotation =
+    let
+        shape = ngon 4 size
+        pattern = makeSquare3Pattern size rotation
+        link = adjacentFlip shape
+    in
+        {shape = shape, pattern = pattern, link = link}
+
+makeHex3Stamp : Float -> Float -> Stamp
+makeHex3Stamp size rotation =
+    let
+        shape = ngon 4 size
+        pattern = makeHex3Pattern size rotation
+        link = adjacentFlip shape
     in
         {shape = shape, pattern = pattern, link = link}
 
