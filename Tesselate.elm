@@ -4,12 +4,20 @@ import Color exposing (red, black, toRgb, rgb)
 import Set
 import Mouse
 import Signal exposing (merge)
-import Html exposing (div)
+import Html exposing (div, button, text, b, Html)
+import Html.Attributes exposing (id)
+import Html.Events exposing (onClick)
 import Stamps exposing (..)
 import Util exposing (..)
+import Dict
 
-type Action = Drag Int Int | MoveMouse Int Int | None
-
+type Action = Drag Int Int | MoveMouse Int Int | SelectShape String | SelectPattern Int | None
+type alias Model = { stamp : Stamp,
+                     editing : Bool,
+                     lastPoint: (Int,Int),
+                     shape: String,
+                     pattern: Int,
+                     debug : String }
 
 distPointEdge : Point -> Edge -> Float
 distPointEdge (x,y) ((x1,y1),(x2,y2)) =
@@ -82,8 +90,7 @@ update action model =
     case action of 
       None -> model
       MoveMouse x y -> updateLastPoint x y model
-      Drag x y -> addDebug (toString <| adjacent <| ngon 4 10)
-                    <| updateLastPoint x y
+      Drag x y -> updateLastPoint x y
                     <| if model.lastPoint == (x,y) 
                         then
                             { model | stamp <- updateStamp
@@ -97,33 +104,86 @@ update action model =
                                                     replacePointInSide
                                                     model.stamp
                             }
+      SelectShape shape -> {model | shape <- shape}
+      SelectPattern pattern_index -> replaceStamp 
+                                        (snd <| get pattern_index <| case Dict.get model.shape stampDict of Just v -> v)
+                                        {model | pattern <- pattern_index}
       otherwise -> model
+
+
+stampDict : Dict.Dict String (List (String, Stamp))
+stampDict = Dict.fromList [ ("Triangle", [("only triangle pattern", makeTriangleStamp 100 0)])
+                          , ("Square", [ ("parallel sides linked", makeSquareStamp 70 0)
+                                       , ("adjacent sides linked", makeSquare2Stamp 70 0)])
+                          , ("Hexagon", [ ("parallel sides linked", makeHexStamp 50 0)
+                                        , ("adjacent sides linked", makeHex2Stamp 50 0)]) ]
 
 addDebug : String -> Model -> Model
 addDebug msg model = {model | debug <- msg }
 
-toCollageCoords : Int -> Int -> (Float, Float)
-toCollageCoords x y = 
-    (
-        toFloat <| x - width//2,
-        toFloat <| height//2 - y
-    )
+replaceStamp : Stamp -> Model -> Model
+replaceStamp stamp model = {model | stamp <- stamp}
 
 model : Model
-model = {stamp = makeSquare3Stamp 50 0,--(pi/4),
+model = {stamp = emptyStamp,
          editing = False,
          lastPoint = (0, 0),
+         shape = "",
+         pattern = -1,
          debug = ""}
 
-drawModel model = div [] 
+drawTesselation : Model -> Html
+drawTesselation model = div [] 
         [ Html.fromElement <|
             layers 
-                --[ draw <| if model.editing == False then drawStamp model.stamp else drawPolygon model.stamp.shape
                 [ drawAll model.stamp
                 , show model.debug ]
         ]
 
+drawSelectors : Signal.Address Action -> Signal.Address Action -> Model -> Html
+drawSelectors shapeAddress patternAddress model = 
+    let 
+        formatSelected option selected = formatSelectedDescription option selected option
+        formatSelectedDescription option selected desc = if option == selected 
+                                then b [] [text desc]
+                                else text desc                        
+    in 
+        div [] 
+            [ text "select shape, then select tesselation pattern. idc if the tesselation pattern has no descriptions."
+            , div [id "shape-select"] 
+                [
+                    button 
+                        [onClick shapeAddress (SelectShape "Triangle") ]
+                        [formatSelected "Triangle" model.shape],
+                    button
+                        [onClick shapeAddress (SelectShape "Square")]
+                        [formatSelected "Square" model.shape],
+                    button
+                        [onClick shapeAddress (SelectShape "Hexagon")]
+                        [formatSelected "Hexagon" model.shape]
+                ]
+            , if model.shape /= ""
+                then div [] <| List.indexedMap 
+                                (\i (description, stamp) -> button 
+                                                [onClick patternAddress (SelectPattern i)]
+                                                [formatSelectedDescription (toString i) (toString model.pattern) description]
+                                )
+                                (case Dict.get model.shape stampDict of Just v -> v)
+                else
+                    div [] []
+            ]
 
-mouseSignal = Signal.map2 (\isDown (x,y) -> if isDown then Drag x y else MoveMouse x y) Mouse.isDown Mouse.position
+drawPage : Signal.Address Action -> Signal.Address Action -> Model -> Html
+drawPage shapeAddress patternAddress model = div []
+    [ drawTesselation model,
+      drawSelectors shapeAddress patternAddress model
+    ]
 
-main = Signal.map drawModel <| Signal.foldp update model mouseSignal
+shapeSelectMailbox = Signal.mailbox None
+patternSelectMailbox = Signal.mailbox None
+
+mouseSignal = Signal.map2 (\isDown (x,y) -> if isDown && (inCanvas x y) then Drag x y else MoveMouse x y) Mouse.isDown Mouse.position
+
+main = Signal.map (drawPage shapeSelectMailbox.address patternSelectMailbox.address) 
+        <| Signal.foldp update model 
+        <| Signal.mergeMany [mouseSignal, shapeSelectMailbox.signal, patternSelectMailbox.signal]

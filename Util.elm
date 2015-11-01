@@ -15,10 +15,23 @@ type alias Stamp = { shape : Polygon,
                      pattern : Pattern, 
                      link : Link }
 type alias Link = Int -> Point -> (Int, Point)
-type alias Model = { stamp : Stamp,
-                     editing : Bool,
-                     lastPoint: (Int,Int),
-                     debug : String }
+
+
+width = 1000
+height = 500
+inCanvas x y = 
+    let
+        (x', y') = toCollageCoords x y
+    in
+        x' >= -width/2 && x' <= width/2 && y' >= -height/2 && y' <= height/2
+toCollageCoords : Int -> Int -> (Float, Float)
+toCollageCoords x y = 
+    (
+        toFloat <| x - width//2,
+        toFloat <| height//2 - y
+    )
+
+largeNumber = 999999999
 
 odd : Int -> Bool
 odd x = x%2==1
