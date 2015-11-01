@@ -104,10 +104,9 @@ update action model =
                                                     replacePointInSide
                                                     model.stamp
                             }
-      SelectShape shape -> {model | shape <- shape}
-      SelectPattern pattern_index -> replaceStamp 
-                                        (snd <| get pattern_index <| case Dict.get model.shape stampDict of Just v -> v)
-                                        {model | pattern <- pattern_index}
+      SelectShape shape -> {model | shape <- shape, pattern <- -1}
+      SelectPattern pattern_index -> {model | pattern <- pattern_index, 
+                                              stamp <- snd <| get pattern_index <| case Dict.get model.shape stampDict of Just v -> v}
       otherwise -> model
 
 

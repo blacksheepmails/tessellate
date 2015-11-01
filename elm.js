@@ -4488,22 +4488,23 @@ Elm.Main.make = function (_elm) {
               model);
             case "None": return model;
             case "SelectPattern":
-            return A2(replaceStamp,
-              $Basics.snd($Util.get(action._0)(function () {
-                 var _v37 = A2($Dict.get,
-                 model.shape,
-                 stampDict);
-                 switch (_v37.ctor)
-                 {case "Just": return _v37._0;}
-                 _U.badCase($moduleName,
-                 "on line 109, column 70 to 120");
-              }())),
-              _U.replace([["pattern"
-                          ,action._0]],
-              model));
+            return _U.replace([["pattern"
+                               ,action._0]
+                              ,["stamp"
+                               ,$Basics.snd($Util.get(action._0)(function () {
+                                  var _v37 = A2($Dict.get,
+                                  model.shape,
+                                  stampDict);
+                                  switch (_v37.ctor)
+                                  {case "Just": return _v37._0;}
+                                  _U.badCase($moduleName,
+                                  "on line 109, column 84 to 134");
+                               }()))]],
+              model);
             case "SelectShape":
             return _U.replace([["shape"
-                               ,action._0]],
+                               ,action._0]
+                              ,["pattern",-1]],
               model);}
          return model;
       }();
@@ -4593,7 +4594,7 @@ Elm.Main.make = function (_elm) {
                                  $Basics.toString(model.pattern),
                                  _v39._0)]));}
                             _U.badCase($moduleName,
-                            "between lines 167 and 169");
+                            "between lines 166 and 168");
                          }();
                       }),
                       function () {
@@ -4603,7 +4604,7 @@ Elm.Main.make = function (_elm) {
                          switch (_v43.ctor)
                          {case "Just": return _v43._0;}
                          _U.badCase($moduleName,
-                         "on line 171, column 34 to 84");
+                         "on line 170, column 34 to 84");
                       }())) : A2($Html.div,
                       _L.fromArray([]),
                       _L.fromArray([]))]));
@@ -4644,7 +4645,7 @@ Elm.Main.make = function (_elm) {
               _v45._0,
               _v45._1);}
          _U.badCase($moduleName,
-         "on line 185, column 45 to 105");
+         "on line 184, column 45 to 105");
       }();
    }),
    $Mouse.isDown,
