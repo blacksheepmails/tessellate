@@ -34,16 +34,6 @@ Elm.Main.make = function (_elm) {
                ,lastPoint: {ctor: "_Tuple2"
                            ,_0: 0
                            ,_1: 0}
-<<<<<<< HEAD
-               ,stamp: A2($Stamps.makeSquare3Stamp,
-               50,
-               0)};
-   var toCollageCoords = F2(function (x,
-   y) {
-      return {ctor: "_Tuple2"
-             ,_0: $Basics.toFloat(x - ($Stamps.width / 2 | 0))
-             ,_1: $Basics.toFloat(($Stamps.height / 2 | 0) - y)};
-=======
                ,pattern: -1
                ,shape: ""
                ,stamp: $Stamps.emptyStamp};
@@ -52,7 +42,6 @@ Elm.Main.make = function (_elm) {
       return _U.replace([["stamp"
                          ,stamp]],
       model);
->>>>>>> dac95168f0206750f804043d2ab1ce62bd5ba464
    });
    var addDebug = F2(function (msg,
    model) {
@@ -77,6 +66,21 @@ Elm.Main.make = function (_elm) {
                                                                   ,{ctor: "_Tuple2"
                                                                    ,_0: "adjacent sides linked"
                                                                    ,_1: A2($Stamps.makeSquare2Stamp,
+                                                                   70,
+                                                                   0)}
+                                                                  ,{ctor: "_Tuple2"
+                                                                   ,_0: "opposite sides fliped"
+                                                                   ,_1: A2($Stamps.makeSquare3Stamp,
+                                                                   70,
+                                                                   0)}
+                                                                  ,{ctor: "_Tuple2"
+                                                                   ,_0: "adjacent sides flipped"
+                                                                   ,_1: A2($Stamps.makeSquare4Stamp,
+                                                                   70,
+                                                                   0)}
+                                                                  ,{ctor: "_Tuple2"
+                                                                   ,_0: "opposite flipped 1 pair"
+                                                                   ,_1: A2($Stamps.makeSquare5Stamp,
                                                                    70,
                                                                    0)}])}
                                                ,{ctor: "_Tuple2"
@@ -118,7 +122,7 @@ Elm.Main.make = function (_elm) {
             switch (_v0.ctor)
             {case "Just": return _v0._0;}
             _U.badCase($moduleName,
-            "on line 64, column 29 to 73");
+            "on line 69, column 29 to 73");
          }(),
          squareDists);
          return _U.eq(index,
@@ -147,7 +151,7 @@ Elm.Main.make = function (_elm) {
             switch (_v2.ctor)
             {case "Just": return _v2._0;}
             _U.badCase($moduleName,
-            "on line 56, column 34 to 81");
+            "on line 61, column 34 to 81");
          }(),
          squareDistSums);
          return A2($Basics._op["++"],
@@ -217,12 +221,12 @@ Elm.Main.make = function (_elm) {
                                    ,_1: _v4._1}) : distFromLine;
                                 }();}
                            _U.badCase($moduleName,
-                           "between lines 24 and 35");
+                           "between lines 29 and 40");
                         }();}
                    break;}
               break;}
          _U.badCase($moduleName,
-         "between lines 24 and 35");
+         "between lines 29 and 40");
       }();
    });
    var getClosestSide = F2(function (_v16,
@@ -250,7 +254,7 @@ Elm.Main.make = function (_elm) {
                                           switch (_v28.ctor)
                                           {case "Just": return _v28._0;}
                                           _U.badCase($moduleName,
-                                          "on line 44, column 49 to 83");
+                                          "on line 49, column 49 to 83");
                                        }()
                                        ,_1: $Util.end(_v20._1)});
                                        return _U.cmp(currDist,
@@ -261,10 +265,10 @@ Elm.Main.make = function (_elm) {
                                                                        ,_1: _v21._1};
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 44 and 47");
+                               "between lines 49 and 52");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 44 and 47");
+                       "between lines 49 and 52");
                     }();
                  });
                  var indexedSides = A2($List.indexedMap,
@@ -282,7 +286,7 @@ Elm.Main.make = function (_elm) {
                  indexedSides));
               }();}
          _U.badCase($moduleName,
-         "between lines 40 and 49");
+         "between lines 45 and 54");
       }();
    });
    var updateStamp = F3(function (point,
@@ -353,7 +357,7 @@ Elm.Main.make = function (_elm) {
                                   switch (_v37.ctor)
                                   {case "Just": return _v37._0;}
                                   _U.badCase($moduleName,
-                                  "on line 109, column 84 to 134");
+                                  "on line 114, column 84 to 134");
                                }()))]],
               model);
             case "SelectShape":
@@ -449,7 +453,7 @@ Elm.Main.make = function (_elm) {
                                  $Basics.toString(model.pattern),
                                  _v39._0)]));}
                             _U.badCase($moduleName,
-                            "between lines 166 and 168");
+                            "between lines 174 and 176");
                          }();
                       }),
                       function () {
@@ -459,7 +463,7 @@ Elm.Main.make = function (_elm) {
                          switch (_v43.ctor)
                          {case "Just": return _v43._0;}
                          _U.badCase($moduleName,
-                         "on line 170, column 34 to 84");
+                         "on line 178, column 34 to 84");
                       }())) : A2($Html.div,
                       _L.fromArray([]),
                       _L.fromArray([]))]));
@@ -500,7 +504,7 @@ Elm.Main.make = function (_elm) {
               _v45._0,
               _v45._1);}
          _U.badCase($moduleName,
-         "on line 184, column 45 to 105");
+         "on line 192, column 45 to 105");
       }();
    }),
    $Mouse.isDown,

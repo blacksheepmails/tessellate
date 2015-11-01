@@ -62,6 +62,17 @@ makeHex2Pattern sideLen rotation =
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
         --neighbors ((0,0), rotation, 0)
 
+makeHex3Pattern : Float -> Float -> Pattern
+makeHex3Pattern sideLen rotation = 
+    let
+        chordLen = sqrt ( 2*sideLen^2 * (1 - (cos <| exteriorAngle 6)) )
+        angles = List.map (\x-> 2*pi*x/3 - pi/6 + rotation) [1..3]
+
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,dir,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (dir+pi/6) (0,0)) ), rem2pi (rotation+dir+2*pi/3), 0) ) angles
+    in
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+        --neighbors ((0,0), rotation, 0)
 
 makeSquarePattern: Float -> Float -> Pattern
 makeSquarePattern sideLen rotation =
@@ -89,10 +100,31 @@ makeSquare3Pattern sideLen rotation =
         angles = List.map (\x-> pi*x/2 + pi/4 + rotation) [1..4]
         chordLen = sideLen * sqrt(2)
         neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,dir,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (dir+pi/4) (0,0) )), rem2pi (rotation+dir+pi), 0) ) angles
+    in
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+
+makeSquare4Pattern: Float -> Float -> Pattern
+makeSquare4Pattern sideLen rotation =
+    let
+        angles = List.map (\x-> pi*x/2 + pi/4 + rotation) [1..4]
+        chordLen = sideLen * sqrt(2)
+        neighbors : (Point, Dir, Int) -> Pattern
         neighbors (origin,_,_) = List.map (\x -> (makePoint chordLen x (origin .+ (makePoint chordLen (pi/4) (-sideLen,-sideLen) )), rotation, 0) ) angles
     in
-        --neighbors ((0,0), rotation, 0)
         Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+
+makeSquare5Pattern: Float -> Float -> Pattern
+makeSquare5Pattern sideLen rotation =
+    let
+        angles = List.map (\x-> pi*x/2 + pi/4 + rotation) [1..4]
+        chordLen = sideLen * sqrt(2)
+        neighbors : (Point, Dir, Int) -> Pattern
+        neighbors (origin,_,flipped) = List.map (\x -> (makePoint chordLen x (if flipped ==1 then origin else origin .+ (makePoint sideLen pi (0,0) )), rotation, (flipped+1)%2) ) angles
+
+    in
+        Set.toList <| addNeighbors neighbors [((0,0), rotation, 0)] Set.empty
+        --neighbors ((0,0), rotation, 0)
 
 
 makeTrianglePattern: Float -> Dir -> Pattern
@@ -120,15 +152,34 @@ opposite shape =
     in
         innerFunction
 
-oppositeFlip : Int -> Float -> Link
-oppositeFlip n d = 
+oppositeFlip : Polygon -> Link
+oppositeFlip shape = 
     let
-        angle = 2 * pi / (toFloat n)
-        initAngle = pi/2
+        n = List.length shape
         innerFunction : Link
-        innerFunction side (x,y) =
-            let angle' = (toFloat side) * angle + (initAngle)
-            in ( (side + n//2) % n, (x + d*(cos angle'), y + d*(sin angle')))
+        innerFunction side p =
+            let 
+                side' = (side+(n//2)) % n
+                (s,e) = sideToEdge <| get side shape
+                (s',e') = sideToEdge <| get side' shape
+            in (side' , fromRelativeCoords (negateY (toRelativeCoords p (s,e))) (s',e') )
+    in
+        innerFunction
+
+oppositeFlip1 : Polygon -> Link
+oppositeFlip1 shape =
+    let
+        n = List.length shape
+        innerFunction : Link
+        innerFunction side p =
+            let 
+                side' = (side+(n//2)) % n
+                (s,e) = sideToEdge <| get side shape
+                (s',e') = sideToEdge <| get side' shape
+            in 
+                if side == 0 || side' == 0
+                    then (side' , fromRelativeCoords (negateY (toRelativeCoords p (s,e))) (s',e') )
+                    else (side' , fromRelativeCoords (toRelativeCoords p (s,e)) (e',s') )
     in
         innerFunction
 
@@ -196,6 +247,7 @@ makeHex2Stamp size rotation =
     in
         {shape = shape, pattern = pattern, link = link}
 
+
 makeSquareStamp : Float -> Float -> Stamp
 makeSquareStamp size rotation = 
     let
@@ -219,16 +271,25 @@ makeSquare3Stamp size rotation =
     let
         shape = ngon 4 size
         pattern = makeSquare3Pattern size rotation
+        link = oppositeFlip shape
+    in
+        {shape = shape, pattern = pattern, link = link}
+
+makeSquare4Stamp : Float -> Float -> Stamp
+makeSquare4Stamp size rotation =
+    let
+        shape = ngon 4 size
+        pattern = makeSquare4Pattern size rotation
         link = adjacentFlip shape
     in
         {shape = shape, pattern = pattern, link = link}
 
-makeHex3Stamp : Float -> Float -> Stamp
-makeHex3Stamp size rotation =
+makeSquare5Stamp : Float -> Float -> Stamp
+makeSquare5Stamp size rotation =
     let
         shape = ngon 4 size
-        pattern = makeHex3Pattern size rotation
-        link = adjacentFlip shape
+        pattern = makeSquare5Pattern size rotation
+        link = oppositeFlip1 shape
     in
         {shape = shape, pattern = pattern, link = link}
 

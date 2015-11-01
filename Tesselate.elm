@@ -11,6 +11,11 @@ import Stamps exposing (..)
 import Util exposing (..)
 import Dict
 
+
+--Triangles should have 2: adj fliped and adj regular
+--Squares should have at least 5. maybe 6: opp, adj, opflip, adjflip, opflip1, and adjflip1?
+--Hexagons should have idk. should at least implement opp adj (adjflip opflip cant exist perhaps need to flip even number of times) , skip1
+
 type Action = Drag Int Int | MoveMouse Int Int | SelectShape String | SelectPattern Int | None
 type alias Model = { stamp : Stamp,
                      editing : Bool,
@@ -113,7 +118,10 @@ update action model =
 stampDict : Dict.Dict String (List (String, Stamp))
 stampDict = Dict.fromList [ ("Triangle", [("only triangle pattern", makeTriangleStamp 100 0)])
                           , ("Square", [ ("parallel sides linked", makeSquareStamp 70 0)
-                                       , ("adjacent sides linked", makeSquare2Stamp 70 0)])
+                                       , ("adjacent sides linked", makeSquare2Stamp 70 0)
+                                       , ("opposite sides fliped", makeSquare3Stamp 70 0)
+                                       , ("adjacent sides flipped", makeSquare4Stamp 70 0)
+                                       , ("opposite flipped 1 pair", makeSquare5Stamp 70 0)])
                           , ("Hexagon", [ ("parallel sides linked", makeHexStamp 50 0)
                                         , ("adjacent sides linked", makeHex2Stamp 50 0)]) ]
 
