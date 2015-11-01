@@ -34,6 +34,16 @@ Elm.Main.make = function (_elm) {
                ,lastPoint: {ctor: "_Tuple2"
                            ,_0: 0
                            ,_1: 0}
+<<<<<<< HEAD
+               ,stamp: A2($Stamps.makeSquare3Stamp,
+               50,
+               0)};
+   var toCollageCoords = F2(function (x,
+   y) {
+      return {ctor: "_Tuple2"
+             ,_0: $Basics.toFloat(x - ($Stamps.width / 2 | 0))
+             ,_1: $Basics.toFloat(($Stamps.height / 2 | 0) - y)};
+=======
                ,pattern: -1
                ,shape: ""
                ,stamp: $Stamps.emptyStamp};
@@ -42,6 +52,7 @@ Elm.Main.make = function (_elm) {
       return _U.replace([["stamp"
                          ,stamp]],
       model);
+>>>>>>> dac95168f0206750f804043d2ab1ce62bd5ba464
    });
    var addDebug = F2(function (msg,
    model) {

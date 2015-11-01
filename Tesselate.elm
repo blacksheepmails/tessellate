@@ -124,7 +124,7 @@ replaceStamp : Stamp -> Model -> Model
 replaceStamp stamp model = {model | stamp <- stamp}
 
 model : Model
-model = {stamp = emptyStamp,--(pi/4),
+model = {stamp = emptyStamp,
          editing = False,
          lastPoint = (0, 0),
          shape = "",
