@@ -10,120 +10,114 @@ import Html.Events exposing (onClick)
 import Stamps exposing (..)
 import Util exposing (..)
 import Dict
+import Keyboard
 
 
---Triangles should have 2: adj fliped and adj regular
+--Triangles should have just 1: adj flipped. adj regular does not provide tiling
 --Squares should have at least 5. maybe 6: opp, adj, opflip, adjflip, opflip1, and adjflip1?
---Hexagons should have idk. should at least implement opp adj (adjflip opflip cant exist perhaps need to flip even number of times) , skip1
+--Hexagons should have idk. should at least implement opp adj (adjflip opflip cant exist perhaps need to flip even number of times) , skip1 cant exist. variatons of skip1 and adj? dont think so either.
 
-type Action = Drag Int Int | MoveMouse Int Int | SelectShape String | SelectPattern Int | None
+type Action = NewPoint Int Int | Drag Int Int | SelectShape String | SelectPattern Int | None
 type alias Model = { stamp : Stamp,
                      editing : Bool,
-                     lastPoint: (Int,Int),
                      shape: String,
                      pattern: Int,
                      debug : String }
-
-distPointEdge : Point -> Edge -> Float
-distPointEdge (x,y) ((x1,y1),(x2,y2)) =
-    let
-        edge = (x2-x1, y2-y1)
-        (xEdge, yEdge) = edge
-        distFromLine = abs <| proj (-yEdge, xEdge) (x-x1,y-y1)
-        distBetweenEnds = dist (x1,y1) (x2,y2)
-        parallelProj1 = abs <| proj edge (x1-x,y1-y)
-        parallelProj2 = abs <| proj edge (x2-x,y2-y)
-    in
-        if
-        | parallelProj1 > distBetweenEnds -> dist (x2,y2) (x,y)
-        | parallelProj2 > distBetweenEnds -> dist (x1,y1) (x,y)
-        | otherwise -> distFromLine
 
 
 getClosestSide : Point -> Polygon -> Int
 getClosestSide (x,y) shape =
     let 
-        indexedSides : List (Int, Side)
-        indexedSides = List.indexedMap (\i x -> (i,x)) shape
-        indexedClosest (i, side) (i', closest) = 
-            let currDist = distPointEdge (x,y) (case List.head side of Just v -> v, (end side))
+        indexedEdges : List (Int, Edge)
+        indexedEdges = List.concat <| List.indexedMap (\i side -> mapBetween (\x y -> (i,(x,y))) side) shape
+
+        indexedClosest (i, edge) (i', closest) = 
+            let currDist = distPointEdge (x,y) edge
             in if currDist < closest 
                 then (i, currDist) 
                 else (i', closest)
     in
-        fst <| List.foldl indexedClosest (0,largeNumber) indexedSides
+        fst <| List.foldl indexedClosest (0,largeNumber) indexedEdges
 
-insertPointInSide : Point -> Side -> Side
-insertPointInSide p side = 
+getClosestPoint : Point -> Polygon -> Maybe (Int, Int)
+getClosestPoint p sides = 
+    case minimumBy 
+        (distSquared p << fst)
+        <| List.concat <| List.indexedMap (\i side -> List.map (\p' -> (p', i)) (middleList side)) sides
+        of
+            Just (point, sideIndex) -> Just (getIndexOf point (get sideIndex sides), sideIndex)
+            Nothing -> Nothing
+
+replacePointInStamp: Point -> Stamp -> Stamp --need last side thing so dragged thing doesnt skip around!!!!!!!!!!!!!!!!!!!!! maybe add point ids to polygons?
+replacePointInStamp p stamp = 
+    case getClosestPoint p stamp.shape of
+        Just (pointIndex, sideIndex) -> 
+            let 
+                side = get sideIndex stamp.shape
+                (sideIndex', p') = stamp.link sideIndex p
+                side' = get sideIndex' stamp.shape
+                pointIndex' = case getClosestPoint p' [side'] of Just (pi, si) -> pi
+                replacePointInSide : Int -> Int -> Point -> List Side -> List Side
+                replacePointInSide si pi point shape = replaceList si (replaceList pi point <| get si shape) shape
+            in 
+                {stamp | shape <- stamp.shape
+                                    |> replacePointInSide sideIndex pointIndex p 
+                                    |> replacePointInSide sideIndex' pointIndex' p'}
+        Nothing -> stamp
+
+insertPointInStamp : Point -> Stamp -> Stamp --something is still a bit funcky but it doesnt happen often
+insertPointInStamp point stamp = 
     let
-        squareDists = List.map (distSquared p) side
-        squareDistSums = mapBetween (+) squareDists
-        index = 1 + (getIndexOf (case List.minimum squareDistSums of Just v -> v) squareDistSums)
-    in
-        (List.take index side) ++ [p] ++ (List.drop index side)
-
-replacePointInSide : Point -> Side -> Side
-replacePointInSide p side = 
-    let
-        squareDists = List.map (distSquared p) side
-        index = getIndexOf (case List.minimum squareDists of Just v -> v) squareDists
-    in
-        if index == 0 || index == (List.length side - 1)
-            then side
-            else (List.take index side) ++ [p] ++ (List.drop (index+1) side)
-
-insertShapeInStamp : Polygon -> Stamp -> Stamp
-insertShapeInStamp shape stamp = {stamp | shape <- shape}
-
-updateStamp : Point -> (Point -> Side -> Side) -> Stamp -> Stamp
-updateStamp point f stamp = 
-    let
+        insertPointInSide : Point -> Side -> Side
+        insertPointInSide p side = 
+            let
+                edges = mapBetween (\p1 p2 -> (p1,p2)) side 
+                distToEdges = List.indexedMap (\i edge -> (distPointEdge p edge, i)) edges
+                mins = List.take 2 <| List.sortBy fst distToEdges
+                calcIndex x = snd x + 1
+                tiebreaker i1 i2 = 
+                    let
+                        (s1,e1) = get i1 edges 
+                        (s2,e2) = get i2 edges
+                        distSquared1 = (distSquared s1 p + distSquared e1 p)
+                        distSquared2 = (distSquared s2 p + distSquared e2 p)
+                    in
+                        if distSquared1 < distSquared2 then i1+1 else i2+1
+                index = case mins of
+                    x::y::[] -> if fuzzyEquals (fst x) (fst y) 
+                                    then tiebreaker (snd x) (snd y)
+                                    else calcIndex x
+                    x::[] -> calcIndex x
+            in
+                insertList index p side
         i = getClosestSide point stamp.shape
         (i',point') = stamp.link i point
         shape' : Polygon
-        shape' = replaceList i' (f point' (get i' stamp.shape)) stamp.shape
+        shape' = replaceList i' (insertPointInSide point' (get i' stamp.shape)) stamp.shape
     in
-        insertShapeInStamp
-            ( replaceList i (f point (get i shape')) shape' )
-            stamp
+        {stamp | shape <- (replaceList i (insertPointInSide point (get i shape')) shape') }
 
-updateLastPoint : Int -> Int -> Model -> Model
-updateLastPoint x y model = { model | lastPoint <- (x,y)}
 
 update : Action -> Model -> Model
 update action model = 
     case action of 
       None -> model
-      MoveMouse x y -> updateLastPoint x y model
-      Drag x y -> updateLastPoint x y
-                    <| if model.lastPoint == (x,y) 
-                        then
-                            { model | stamp <- updateStamp
-                                                    (toCollageCoords x y) 
-                                                    insertPointInSide
-                                                    model.stamp
-                            }
-                        else 
-                            { model | stamp <- updateStamp 
-                                                    (toCollageCoords x y)
-                                                    replacePointInSide
-                                                    model.stamp
-                            }
+      NewPoint x y -> { model | stamp <- insertPointInStamp (toCollageCoords x y) model.stamp }
+      Drag x y -> { model | stamp <- replacePointInStamp (toCollageCoords x y) model.stamp }
       SelectShape shape -> {model | shape <- shape, pattern <- -1}
       SelectPattern pattern_index -> {model | pattern <- pattern_index, 
                                               stamp <- snd <| get pattern_index <| case Dict.get model.shape stampDict of Just v -> v}
       otherwise -> model
 
-
 stampDict : Dict.Dict String (List (String, Stamp))
-stampDict = Dict.fromList [ ("Triangle", [("only triangle pattern", makeTriangleStamp 100 0)])
-                          , ("Square", [ ("parallel sides linked", makeSquareStamp 70 0)
-                                       , ("adjacent sides linked", makeSquare2Stamp 70 0)
-                                       , ("opposite sides fliped", makeSquare3Stamp 70 0)
-                                       , ("adjacent sides flipped", makeSquare4Stamp 70 0)
-                                       , ("opposite flipped 1 pair", makeSquare5Stamp 70 0)])
-                          , ("Hexagon", [ ("parallel sides linked", makeHexStamp 50 0)
-                                        , ("adjacent sides linked", makeHex2Stamp 50 0)]) ]
+stampDict = Dict.fromList [ ("Triangle", [("only triangle pattern (p2gg)", makeTriangleStamp 100 0)])
+                          , ("Square", [ ("parallel sides linked (p1)", makeSquareStamp 70 0)
+                                       , ("adjacent sides linked (p4)", makeSquare2Stamp 70 0)
+                                       , ("opposite sides fliped (p2gg)", makeSquare3Stamp 70 0)
+                                       , ("adjacent sides flipped (p1)", makeSquare4Stamp 70 0)
+                                       , ("opposite flipped 1 pair (p2gg)", makeSquare5Stamp 70 0)])
+                          , ("Hexagon", [ ("parallel sides linked (p1)" , makeHexStamp 50 0)
+                                        , ("adjacent sides linked (p3)", makeHex2Stamp 50 0)]) ]
 
 addDebug : String -> Model -> Model
 addDebug msg model = {model | debug <- msg }
@@ -134,7 +128,6 @@ replaceStamp stamp model = {model | stamp <- stamp}
 model : Model
 model = {stamp = emptyStamp,
          editing = False,
-         lastPoint = (0, 0),
          shape = "",
          pattern = -1,
          debug = ""}
@@ -156,7 +149,7 @@ drawSelectors shapeAddress patternAddress model =
                                 else text desc                        
     in 
         div [] 
-            [ text "select shape, then select tesselation pattern. idc if the tesselation pattern has no descriptions."
+            [ text "select shape, then select tesselation pattern. the base shape is black and in the center. to edit: ctrl-click to add new point, drag to edit existing point. if you ctrl-drag, you'll be creating lots and lots of points! in parens are the associated wallpaper groups the generated pattern will produce."
             , div [id "shape-select"] 
                 [
                     button 
@@ -189,8 +182,12 @@ drawPage shapeAddress patternAddress model = div []
 shapeSelectMailbox = Signal.mailbox None
 patternSelectMailbox = Signal.mailbox None
 
-mouseSignal = Signal.map2 (\isDown (x,y) -> if isDown && (inCanvas x y) then Drag x y else MoveMouse x y) Mouse.isDown Mouse.position
+drawSignal = Signal.map3
+                (\mouseDown (x,y) ctrl -> if mouseDown && (inCanvas x y) 
+                                            then if ctrl then NewPoint x y else Drag x y
+                                            else None)
+                Mouse.isDown Mouse.position Keyboard.ctrl
 
 main = Signal.map (drawPage shapeSelectMailbox.address patternSelectMailbox.address) 
         <| Signal.foldp update model 
-        <| Signal.mergeMany [mouseSignal, shapeSelectMailbox.signal, patternSelectMailbox.signal]
+        <| Signal.mergeMany [drawSignal, shapeSelectMailbox.signal, patternSelectMailbox.signal]

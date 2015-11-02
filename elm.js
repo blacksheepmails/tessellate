@@ -3799,6 +3799,170 @@ Elm.Json.Encode.make = function (_elm) {
                              ,Value: Value};
    return _elm.Json.Encode.values;
 };
+Elm.Keyboard = Elm.Keyboard || {};
+Elm.Keyboard.make = function (_elm) {
+   "use strict";
+   _elm.Keyboard = _elm.Keyboard || {};
+   if (_elm.Keyboard.values)
+   return _elm.Keyboard.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Keyboard",
+   $Basics = Elm.Basics.make(_elm),
+   $Native$Keyboard = Elm.Native.Keyboard.make(_elm),
+   $Set = Elm.Set.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var presses = A2($Signal.map,
+   function (_) {
+      return _.keyCode;
+   },
+   $Native$Keyboard.presses);
+   var toXY = F2(function (_v0,
+   keyCodes) {
+      return function () {
+         return function () {
+            var is = function (keyCode) {
+               return A2($Set.member,
+               keyCode,
+               keyCodes) ? 1 : 0;
+            };
+            return {_: {}
+                   ,x: is(_v0.right) - is(_v0.left)
+                   ,y: is(_v0.up) - is(_v0.down)};
+         }();
+      }();
+   });
+   var Directions = F4(function (a,
+   b,
+   c,
+   d) {
+      return {_: {}
+             ,down: b
+             ,left: c
+             ,right: d
+             ,up: a};
+   });
+   var dropMap = F2(function (f,
+   signal) {
+      return $Signal.dropRepeats(A2($Signal.map,
+      f,
+      signal));
+   });
+   var EventInfo = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,alt: a
+             ,keyCode: c
+             ,meta: b};
+   });
+   var Blur = {ctor: "Blur"};
+   var Down = function (a) {
+      return {ctor: "Down",_0: a};
+   };
+   var Up = function (a) {
+      return {ctor: "Up",_0: a};
+   };
+   var rawEvents = $Signal.mergeMany(_L.fromArray([A2($Signal.map,
+                                                  Up,
+                                                  $Native$Keyboard.ups)
+                                                  ,A2($Signal.map,
+                                                  Down,
+                                                  $Native$Keyboard.downs)
+                                                  ,A2($Signal.map,
+                                                  $Basics.always(Blur),
+                                                  $Native$Keyboard.blurs)]));
+   var empty = {_: {}
+               ,alt: false
+               ,keyCodes: $Set.empty
+               ,meta: false};
+   var update = F2(function (event,
+   model) {
+      return function () {
+         switch (event.ctor)
+         {case "Blur": return empty;
+            case "Down": return {_: {}
+                                ,alt: event._0.alt
+                                ,keyCodes: A2($Set.insert,
+                                event._0.keyCode,
+                                model.keyCodes)
+                                ,meta: event._0.meta};
+            case "Up": return {_: {}
+                              ,alt: event._0.alt
+                              ,keyCodes: A2($Set.remove,
+                              event._0.keyCode,
+                              model.keyCodes)
+                              ,meta: event._0.meta};}
+         _U.badCase($moduleName,
+         "between lines 68 and 82");
+      }();
+   });
+   var model = A3($Signal.foldp,
+   update,
+   empty,
+   rawEvents);
+   var alt = A2(dropMap,
+   function (_) {
+      return _.alt;
+   },
+   model);
+   var meta = A2(dropMap,
+   function (_) {
+      return _.meta;
+   },
+   model);
+   var keysDown = A2(dropMap,
+   function (_) {
+      return _.keyCodes;
+   },
+   model);
+   var arrows = A2(dropMap,
+   toXY({_: {}
+        ,down: 40
+        ,left: 37
+        ,right: 39
+        ,up: 38}),
+   keysDown);
+   var wasd = A2(dropMap,
+   toXY({_: {}
+        ,down: 83
+        ,left: 65
+        ,right: 68
+        ,up: 87}),
+   keysDown);
+   var isDown = function (keyCode) {
+      return A2(dropMap,
+      $Set.member(keyCode),
+      keysDown);
+   };
+   var ctrl = isDown(17);
+   var shift = isDown(16);
+   var space = isDown(32);
+   var enter = isDown(13);
+   var Model = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,alt: a
+             ,keyCodes: c
+             ,meta: b};
+   });
+   _elm.Keyboard.values = {_op: _op
+                          ,arrows: arrows
+                          ,wasd: wasd
+                          ,enter: enter
+                          ,space: space
+                          ,ctrl: ctrl
+                          ,shift: shift
+                          ,alt: alt
+                          ,meta: meta
+                          ,isDown: isDown
+                          ,keysDown: keysDown
+                          ,presses: presses};
+   return _elm.Keyboard.values;
+};
 Elm.List = Elm.List || {};
 Elm.List.make = function (_elm) {
    "use strict";
@@ -4171,6 +4335,7 @@ Elm.Main.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
+   $Keyboard = Elm.Keyboard.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
@@ -4187,9 +4352,6 @@ Elm.Main.make = function (_elm) {
    var model = {_: {}
                ,debug: ""
                ,editing: false
-               ,lastPoint: {ctor: "_Tuple2"
-                           ,_0: 0
-                           ,_1: 0}
                ,pattern: -1
                ,shape: ""
                ,stamp: $Stamps.emptyStamp};
@@ -4208,245 +4370,202 @@ Elm.Main.make = function (_elm) {
    var stampDict = $Dict.fromList(_L.fromArray([{ctor: "_Tuple2"
                                                 ,_0: "Triangle"
                                                 ,_1: _L.fromArray([{ctor: "_Tuple2"
-                                                                   ,_0: "only triangle pattern"
+                                                                   ,_0: "only triangle pattern (p2gg)"
                                                                    ,_1: A2($Stamps.makeTriangleStamp,
                                                                    100,
                                                                    0)}])}
                                                ,{ctor: "_Tuple2"
                                                 ,_0: "Square"
                                                 ,_1: _L.fromArray([{ctor: "_Tuple2"
-                                                                   ,_0: "parallel sides linked"
+                                                                   ,_0: "parallel sides linked (p1)"
                                                                    ,_1: A2($Stamps.makeSquareStamp,
                                                                    70,
                                                                    0)}
                                                                   ,{ctor: "_Tuple2"
-                                                                   ,_0: "adjacent sides linked"
+                                                                   ,_0: "adjacent sides linked (p4)"
                                                                    ,_1: A2($Stamps.makeSquare2Stamp,
                                                                    70,
                                                                    0)}
                                                                   ,{ctor: "_Tuple2"
-                                                                   ,_0: "opposite sides fliped"
+                                                                   ,_0: "opposite sides fliped (p2gg)"
                                                                    ,_1: A2($Stamps.makeSquare3Stamp,
                                                                    70,
                                                                    0)}
                                                                   ,{ctor: "_Tuple2"
-                                                                   ,_0: "adjacent sides flipped"
+                                                                   ,_0: "adjacent sides flipped (p1)"
                                                                    ,_1: A2($Stamps.makeSquare4Stamp,
                                                                    70,
                                                                    0)}
                                                                   ,{ctor: "_Tuple2"
-                                                                   ,_0: "opposite flipped 1 pair"
+                                                                   ,_0: "opposite flipped 1 pair (p2gg)"
                                                                    ,_1: A2($Stamps.makeSquare5Stamp,
                                                                    70,
                                                                    0)}])}
                                                ,{ctor: "_Tuple2"
                                                 ,_0: "Hexagon"
                                                 ,_1: _L.fromArray([{ctor: "_Tuple2"
-                                                                   ,_0: "parallel sides linked"
+                                                                   ,_0: "parallel sides linked (p1)"
                                                                    ,_1: A2($Stamps.makeHexStamp,
                                                                    50,
                                                                    0)}
                                                                   ,{ctor: "_Tuple2"
-                                                                   ,_0: "adjacent sides linked"
+                                                                   ,_0: "adjacent sides linked (p3)"
                                                                    ,_1: A2($Stamps.makeHex2Stamp,
                                                                    50,
                                                                    0)}])}]));
-   var updateLastPoint = F3(function (x,
-   y,
-   model) {
-      return _U.replace([["lastPoint"
-                         ,{ctor: "_Tuple2"
-                          ,_0: x
-                          ,_1: y}]],
-      model);
-   });
-   var insertShapeInStamp = F2(function (shape,
-   stamp) {
-      return _U.replace([["shape"
-                         ,shape]],
-      stamp);
-   });
-   var replacePointInSide = F2(function (p,
-   side) {
+   var getClosestPoint = F2(function (p,
+   sides) {
       return function () {
-         var squareDists = A2($List.map,
-         $Util.distSquared(p),
-         side);
-         var index = A2($Util.getIndexOf,
-         function () {
-            var _v0 = $List.minimum(squareDists);
-            switch (_v0.ctor)
-            {case "Just": return _v0._0;}
-            _U.badCase($moduleName,
-            "on line 69, column 29 to 73");
-         }(),
-         squareDists);
-         return _U.eq(index,
-         0) || _U.eq(index,
-         $List.length(side) - 1) ? side : A2($Basics._op["++"],
-         A2($List.take,index,side),
-         A2($Basics._op["++"],
-         _L.fromArray([p]),
-         A2($List.drop,index + 1,side)));
-      }();
-   });
-   var insertPointInSide = F2(function (p,
-   side) {
-      return function () {
-         var squareDists = A2($List.map,
-         $Util.distSquared(p),
-         side);
-         var squareDistSums = A2($Util.mapBetween,
-         F2(function (x,y) {
-            return x + y;
+         var _v0 = $Util.minimumBy(function ($) {
+            return $Util.distSquared(p)($Basics.fst($));
+         })($List.concat(A2($List.indexedMap,
+         F2(function (i,side) {
+            return A2($List.map,
+            function (p$) {
+               return {ctor: "_Tuple2"
+                      ,_0: p$
+                      ,_1: i};
+            },
+            $Util.middleList(side));
          }),
-         squareDists);
-         var index = 1 + A2($Util.getIndexOf,
-         function () {
-            var _v2 = $List.minimum(squareDistSums);
-            switch (_v2.ctor)
-            {case "Just": return _v2._0;}
-            _U.badCase($moduleName,
-            "on line 61, column 34 to 81");
-         }(),
-         squareDistSums);
-         return A2($Basics._op["++"],
-         A2($List.take,index,side),
-         A2($Basics._op["++"],
-         _L.fromArray([p]),
-         A2($List.drop,index,side)));
-      }();
-   });
-   var distPointEdge = F2(function (_v4,
-   _v5) {
-      return function () {
-         switch (_v5.ctor)
-         {case "_Tuple2":
-            switch (_v5._0.ctor)
+         sides)));
+         switch (_v0.ctor)
+         {case "Just":
+            switch (_v0._0.ctor)
               {case "_Tuple2":
-                 switch (_v5._1.ctor)
-                   {case "_Tuple2":
-                      return function () {
-                           switch (_v4.ctor)
-                           {case "_Tuple2":
-                              return function () {
-                                   var distBetweenEnds = A2($Util.dist,
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v5._0._0
-                                   ,_1: _v5._0._1},
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v5._1._0
-                                   ,_1: _v5._1._1});
-                                   var edge = {ctor: "_Tuple2"
-                                              ,_0: _v5._1._0 - _v5._0._0
-                                              ,_1: _v5._1._1 - _v5._0._1};
-                                   var $ = edge,
-                                   xEdge = $._0,
-                                   yEdge = $._1;
-                                   var distFromLine = $Basics.abs(A2($Util.proj,
-                                   {ctor: "_Tuple2"
-                                   ,_0: 0 - yEdge
-                                   ,_1: xEdge},
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v4._0 - _v5._0._0
-                                   ,_1: _v4._1 - _v5._0._1}));
-                                   var parallelProj1 = $Basics.abs(A2($Util.proj,
-                                   edge,
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v5._0._0 - _v4._0
-                                   ,_1: _v5._0._1 - _v4._1}));
-                                   var parallelProj2 = $Basics.abs(A2($Util.proj,
-                                   edge,
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v5._1._0 - _v4._0
-                                   ,_1: _v5._1._1 - _v4._1}));
-                                   return _U.cmp(parallelProj1,
-                                   distBetweenEnds) > 0 ? A2($Util.dist,
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v5._1._0
-                                   ,_1: _v5._1._1},
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v4._0
-                                   ,_1: _v4._1}) : _U.cmp(parallelProj2,
-                                   distBetweenEnds) > 0 ? A2($Util.dist,
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v5._0._0
-                                   ,_1: _v5._0._1},
-                                   {ctor: "_Tuple2"
-                                   ,_0: _v4._0
-                                   ,_1: _v4._1}) : distFromLine;
-                                }();}
-                           _U.badCase($moduleName,
-                           "between lines 29 and 40");
-                        }();}
-                   break;}
-              break;}
+                 return $Maybe.Just({ctor: "_Tuple2"
+                                    ,_0: A2($Util.getIndexOf,
+                                    _v0._0._0,
+                                    A2($Util.get,_v0._0._1,sides))
+                                    ,_1: _v0._0._1});}
+              break;
+            case "Nothing":
+            return $Maybe.Nothing;}
          _U.badCase($moduleName,
-         "between lines 29 and 40");
+         "between lines 44 and 49");
       }();
    });
-   var getClosestSide = F2(function (_v16,
+   var replacePointInStamp = F2(function (p,
+   stamp) {
+      return function () {
+         var _v4 = A2(getClosestPoint,
+         p,
+         stamp.shape);
+         switch (_v4.ctor)
+         {case "Just":
+            switch (_v4._0.ctor)
+              {case "_Tuple2":
+                 return function () {
+                      var replacePointInSide = F4(function (si,
+                      pi,
+                      point,
+                      shape) {
+                         return A3($Util.replaceList,
+                         si,
+                         A2($Util.replaceList,
+                         pi,
+                         point)(A2($Util.get,si,shape)),
+                         shape);
+                      });
+                      var $ = A2(stamp.link,
+                      _v4._0._1,
+                      p),
+                      sideIndex$ = $._0,
+                      p$ = $._1;
+                      var side$ = A2($Util.get,
+                      sideIndex$,
+                      stamp.shape);
+                      var pointIndex$ = function () {
+                         var _v8 = A2(getClosestPoint,
+                         p$,
+                         _L.fromArray([side$]));
+                         switch (_v8.ctor)
+                         {case "Just":
+                            switch (_v8._0.ctor)
+                              {case "_Tuple2":
+                                 return _v8._0._0;}
+                              break;}
+                         _U.badCase($moduleName,
+                         "between lines 59 and 60");
+                      }();
+                      var side = A2($Util.get,
+                      _v4._0._1,
+                      stamp.shape);
+                      return _U.replace([["shape"
+                                         ,A3(replacePointInSide,
+                                         sideIndex$,
+                                         pointIndex$,
+                                         p$)(A3(replacePointInSide,
+                                         _v4._0._1,
+                                         _v4._0._0,
+                                         p)(stamp.shape))]],
+                      stamp);
+                   }();}
+              break;
+            case "Nothing": return stamp;}
+         _U.badCase($moduleName,
+         "between lines 53 and 66");
+      }();
+   });
+   var getClosestSide = F2(function (_v12,
    shape) {
       return function () {
-         switch (_v16.ctor)
+         switch (_v12.ctor)
          {case "_Tuple2":
             return function () {
-                 var indexedClosest = F2(function (_v20,
-                 _v21) {
+                 var indexedClosest = F2(function (_v16,
+                 _v17) {
                     return function () {
-                       switch (_v21.ctor)
+                       switch (_v17.ctor)
                        {case "_Tuple2":
                           return function () {
-                               switch (_v20.ctor)
+                               switch (_v16.ctor)
                                {case "_Tuple2":
                                   return function () {
-                                       var currDist = A2(distPointEdge,
+                                       var currDist = A2($Util.distPointEdge,
                                        {ctor: "_Tuple2"
-                                       ,_0: _v16._0
-                                       ,_1: _v16._1},
-                                       {ctor: "_Tuple2"
-                                       ,_0: function () {
-                                          var _v28 = $List.head(_v20._1);
-                                          switch (_v28.ctor)
-                                          {case "Just": return _v28._0;}
-                                          _U.badCase($moduleName,
-                                          "on line 49, column 49 to 83");
-                                       }()
-                                       ,_1: $Util.end(_v20._1)});
+                                       ,_0: _v12._0
+                                       ,_1: _v12._1},
+                                       _v16._1);
                                        return _U.cmp(currDist,
-                                       _v21._1) < 0 ? {ctor: "_Tuple2"
-                                                      ,_0: _v20._0
+                                       _v17._1) < 0 ? {ctor: "_Tuple2"
+                                                      ,_0: _v16._0
                                                       ,_1: currDist} : {ctor: "_Tuple2"
-                                                                       ,_0: _v21._0
-                                                                       ,_1: _v21._1};
+                                                                       ,_0: _v17._0
+                                                                       ,_1: _v17._1};
                                     }();}
                                _U.badCase($moduleName,
-                               "between lines 49 and 52");
+                               "between lines 35 and 38");
                             }();}
                        _U.badCase($moduleName,
-                       "between lines 49 and 52");
+                       "between lines 35 and 38");
                     }();
                  });
-                 var indexedSides = A2($List.indexedMap,
-                 F2(function (i,x) {
-                    return {ctor: "_Tuple2"
-                           ,_0: i
-                           ,_1: x};
+                 var indexedEdges = $List.concat(A2($List.indexedMap,
+                 F2(function (i,side) {
+                    return A2($Util.mapBetween,
+                    F2(function (x,y) {
+                       return {ctor: "_Tuple2"
+                              ,_0: i
+                              ,_1: {ctor: "_Tuple2"
+                                   ,_0: x
+                                   ,_1: y}};
+                    }),
+                    side);
                  }),
-                 shape);
+                 shape));
                  return $Basics.fst(A3($List.foldl,
                  indexedClosest,
                  {ctor: "_Tuple2"
                  ,_0: 0
                  ,_1: $Util.largeNumber},
-                 indexedSides));
+                 indexedEdges));
               }();}
          _U.badCase($moduleName,
-         "between lines 45 and 54");
+         "between lines 30 and 40");
       }();
    });
-   var updateStamp = F3(function (point,
-   f,
+   var insertPointInStamp = F2(function (point,
    stamp) {
       return function () {
          var i = A2(getClosestSide,
@@ -4455,19 +4574,90 @@ Elm.Main.make = function (_elm) {
          var $ = A2(stamp.link,i,point),
          i$ = $._0,
          point$ = $._1;
+         var insertPointInSide = F2(function (p,
+         side) {
+            return function () {
+               var calcIndex = function (x) {
+                  return $Basics.snd(x) + 1;
+               };
+               var edges = A2($Util.mapBetween,
+               F2(function (p1,p2) {
+                  return {ctor: "_Tuple2"
+                         ,_0: p1
+                         ,_1: p2};
+               }),
+               side);
+               var distToEdges = A2($List.indexedMap,
+               F2(function (i,edge) {
+                  return {ctor: "_Tuple2"
+                         ,_0: A2($Util.distPointEdge,
+                         p,
+                         edge)
+                         ,_1: i};
+               }),
+               edges);
+               var mins = $List.take(2)(A2($List.sortBy,
+               $Basics.fst,
+               distToEdges));
+               var tiebreaker = F2(function (i1,
+               i2) {
+                  return function () {
+                     var $ = A2($Util.get,
+                     i2,
+                     edges),
+                     s2 = $._0,
+                     e2 = $._1;
+                     var distSquared2 = A2($Util.distSquared,
+                     s2,
+                     p) + A2($Util.distSquared,e2,p);
+                     var $ = A2($Util.get,i1,edges),
+                     s1 = $._0,
+                     e1 = $._1;
+                     var distSquared1 = A2($Util.distSquared,
+                     s1,
+                     p) + A2($Util.distSquared,e1,p);
+                     return _U.cmp(distSquared1,
+                     distSquared2) < 0 ? i1 + 1 : i2 + 1;
+                  }();
+               });
+               var index = function () {
+                  switch (mins.ctor)
+                  {case "::":
+                     switch (mins._1.ctor)
+                       {case "::":
+                          switch (mins._1._1.ctor)
+                            {case "[]":
+                               return A2($Util.fuzzyEquals,
+                                 $Basics.fst(mins._0),
+                                 $Basics.fst(mins._1._0)) ? A2(tiebreaker,
+                                 $Basics.snd(mins._0),
+                                 $Basics.snd(mins._1._0)) : calcIndex(mins._0);}
+                            break;
+                          case "[]":
+                          return calcIndex(mins._0);}
+                       break;}
+                  _U.badCase($moduleName,
+                  "between lines 86 and 91");
+               }();
+               return A3($Util.insertList,
+               index,
+               p,
+               side);
+            }();
+         });
          var shape$ = A3($Util.replaceList,
          i$,
-         A2(f,
+         A2(insertPointInSide,
          point$,
          A2($Util.get,i$,stamp.shape)),
          stamp.shape);
-         return A2(insertShapeInStamp,
-         A3($Util.replaceList,
-         i,
-         A2(f,
-         point,
-         A2($Util.get,i,shape$)),
-         shape$),
+         return _U.replace([["shape"
+                            ,A3($Util.replaceList,
+                            i,
+                            A2(insertPointInSide,
+                            point,
+                            A2($Util.get,i,shape$)),
+                            shape$)]],
          stamp);
       }();
    });
@@ -4476,30 +4666,20 @@ Elm.Main.make = function (_elm) {
       return function () {
          switch (action.ctor)
          {case "Drag":
-            return A2(updateLastPoint,
-              action._0,
-              action._1)(_U.eq(model.lastPoint,
-              {ctor: "_Tuple2"
-              ,_0: action._0
-              ,_1: action._1}) ? _U.replace([["stamp"
-                                             ,A3(updateStamp,
-                                             A2($Util.toCollageCoords,
-                                             action._0,
-                                             action._1),
-                                             insertPointInSide,
-                                             model.stamp)]],
-              model) : _U.replace([["stamp"
-                                   ,A3(updateStamp,
-                                   A2($Util.toCollageCoords,
-                                   action._0,
-                                   action._1),
-                                   replacePointInSide,
-                                   model.stamp)]],
-              model));
-            case "MoveMouse":
-            return A3(updateLastPoint,
-              action._0,
-              action._1,
+            return _U.replace([["stamp"
+                               ,A2(replacePointInStamp,
+                               A2($Util.toCollageCoords,
+                               action._0,
+                               action._1),
+                               model.stamp)]],
+              model);
+            case "NewPoint":
+            return _U.replace([["stamp"
+                               ,A2(insertPointInStamp,
+                               A2($Util.toCollageCoords,
+                               action._0,
+                               action._1),
+                               model.stamp)]],
               model);
             case "None": return model;
             case "SelectPattern":
@@ -4507,13 +4687,13 @@ Elm.Main.make = function (_elm) {
                                ,action._0]
                               ,["stamp"
                                ,$Basics.snd($Util.get(action._0)(function () {
-                                  var _v37 = A2($Dict.get,
+                                  var _v36 = A2($Dict.get,
                                   model.shape,
                                   stampDict);
-                                  switch (_v37.ctor)
-                                  {case "Just": return _v37._0;}
+                                  switch (_v36.ctor)
+                                  {case "Just": return _v36._0;}
                                   _U.badCase($moduleName,
-                                  "on line 114, column 84 to 134");
+                                  "on line 109, column 84 to 134");
                                }()))]],
               model);
             case "SelectShape":
@@ -4524,18 +4704,16 @@ Elm.Main.make = function (_elm) {
          return model;
       }();
    });
-   var Model = F6(function (a,
+   var Model = F5(function (a,
    b,
    c,
    d,
-   e,
-   f) {
+   e) {
       return {_: {}
-             ,debug: f
+             ,debug: e
              ,editing: b
-             ,lastPoint: c
-             ,pattern: e
-             ,shape: d
+             ,pattern: d
+             ,shape: c
              ,stamp: a};
    });
    var None = {ctor: "None"};
@@ -4570,7 +4748,7 @@ Elm.Main.make = function (_elm) {
          });
          return A2($Html.div,
          _L.fromArray([]),
-         _L.fromArray([$Html.text("select shape, then select tesselation pattern. idc if the tesselation pattern has no descriptions.")
+         _L.fromArray([$Html.text("select shape, then select tesselation pattern. the base shape is black and in the center. to edit: ctrl-click to add new point, drag to edit existing point. if you ctrl-drag, you\'ll be creating lots and lots of points! in parens are the associated wallpaper groups the generated pattern will produce.")
                       ,A2($Html.div,
                       _L.fromArray([$Html$Attributes.id("shape-select")]),
                       _L.fromArray([A2($Html.button,
@@ -4596,9 +4774,9 @@ Elm.Main.make = function (_elm) {
                                    model.shape)]))]))
                       ,!_U.eq(model.shape,
                       "") ? $Html.div(_L.fromArray([]))(A2($List.indexedMap,
-                      F2(function (i,_v39) {
+                      F2(function (i,_v38) {
                          return function () {
-                            switch (_v39.ctor)
+                            switch (_v38.ctor)
                             {case "_Tuple2":
                                return A2($Html.button,
                                  _L.fromArray([A2($Html$Events.onClick,
@@ -4607,19 +4785,19 @@ Elm.Main.make = function (_elm) {
                                  _L.fromArray([A3(formatSelectedDescription,
                                  $Basics.toString(i),
                                  $Basics.toString(model.pattern),
-                                 _v39._0)]));}
+                                 _v38._0)]));}
                             _U.badCase($moduleName,
-                            "between lines 174 and 176");
+                            "between lines 167 and 169");
                          }();
                       }),
                       function () {
-                         var _v43 = A2($Dict.get,
+                         var _v42 = A2($Dict.get,
                          model.shape,
                          stampDict);
-                         switch (_v43.ctor)
-                         {case "Just": return _v43._0;}
+                         switch (_v42.ctor)
+                         {case "Just": return _v42._0;}
                          _U.badCase($moduleName,
-                         "on line 178, column 34 to 84");
+                         "on line 171, column 34 to 84");
                       }())) : A2($Html.div,
                       _L.fromArray([]),
                       _L.fromArray([]))]));
@@ -4636,56 +4814,56 @@ Elm.Main.make = function (_elm) {
                    patternAddress,
                    model)]));
    });
-   var MoveMouse = F2(function (a,
-   b) {
-      return {ctor: "MoveMouse"
-             ,_0: a
-             ,_1: b};
-   });
    var Drag = F2(function (a,b) {
       return {ctor: "Drag"
              ,_0: a
              ,_1: b};
    });
-   var mouseSignal = A3($Signal.map2,
-   F2(function (isDown,_v45) {
+   var NewPoint = F2(function (a,
+   b) {
+      return {ctor: "NewPoint"
+             ,_0: a
+             ,_1: b};
+   });
+   var drawSignal = A4($Signal.map3,
+   F3(function (mouseDown,
+   _v44,
+   ctrl) {
       return function () {
-         switch (_v45.ctor)
+         switch (_v44.ctor)
          {case "_Tuple2":
-            return isDown && A2($Util.inCanvas,
-              _v45._0,
-              _v45._1) ? A2(Drag,
-              _v45._0,
-              _v45._1) : A2(MoveMouse,
-              _v45._0,
-              _v45._1);}
+            return mouseDown && A2($Util.inCanvas,
+              _v44._0,
+              _v44._1) ? ctrl ? A2(NewPoint,
+              _v44._0,
+              _v44._1) : A2(Drag,
+              _v44._0,
+              _v44._1) : None;}
          _U.badCase($moduleName,
-         "on line 192, column 45 to 105");
+         "between lines 186 and 188");
       }();
    }),
    $Mouse.isDown,
-   $Mouse.position);
+   $Mouse.position,
+   $Keyboard.ctrl);
    var main = $Signal.map(A2(drawPage,
    shapeSelectMailbox.address,
    patternSelectMailbox.address))(A2($Signal.foldp,
    update,
-   model)($Signal.mergeMany(_L.fromArray([mouseSignal
+   model)($Signal.mergeMany(_L.fromArray([drawSignal
                                          ,shapeSelectMailbox.signal
                                          ,patternSelectMailbox.signal]))));
    _elm.Main.values = {_op: _op
+                      ,NewPoint: NewPoint
                       ,Drag: Drag
-                      ,MoveMouse: MoveMouse
                       ,SelectShape: SelectShape
                       ,SelectPattern: SelectPattern
                       ,None: None
                       ,Model: Model
-                      ,distPointEdge: distPointEdge
                       ,getClosestSide: getClosestSide
-                      ,insertPointInSide: insertPointInSide
-                      ,replacePointInSide: replacePointInSide
-                      ,insertShapeInStamp: insertShapeInStamp
-                      ,updateStamp: updateStamp
-                      ,updateLastPoint: updateLastPoint
+                      ,getClosestPoint: getClosestPoint
+                      ,replacePointInStamp: replacePointInStamp
+                      ,insertPointInStamp: insertPointInStamp
                       ,update: update
                       ,stampDict: stampDict
                       ,addDebug: addDebug
@@ -4696,7 +4874,7 @@ Elm.Main.make = function (_elm) {
                       ,drawPage: drawPage
                       ,shapeSelectMailbox: shapeSelectMailbox
                       ,patternSelectMailbox: patternSelectMailbox
-                      ,mouseSignal: mouseSignal
+                      ,drawSignal: drawSignal
                       ,main: main};
    return _elm.Main.values;
 };
@@ -7913,6 +8091,56 @@ Elm.Native.Json.make = function(localRuntime) {
 		encodeList: List.toArray,
 		encodeObject: encodeObject
 
+	};
+
+};
+
+Elm.Native.Keyboard = {};
+Elm.Native.Keyboard.make = function(localRuntime) {
+
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
+	if (localRuntime.Native.Keyboard.values)
+	{
+		return localRuntime.Native.Keyboard.values;
+	}
+
+	var NS = Elm.Native.Signal.make(localRuntime);
+
+
+	function keyEvent(event)
+	{
+		return {
+			_: {},
+			alt: event.altKey,
+			meta: event.metaKey,
+			keyCode: event.keyCode
+		};
+	}
+
+
+	function keyStream(node, eventName, handler)
+	{
+		var stream = NS.input(eventName, '\0');
+
+		localRuntime.addListener([stream.id], node, eventName, function(e) {
+			localRuntime.notify(stream.id, handler(e));
+		});
+
+		return stream;
+	}
+
+	var downs = keyStream(document, 'keydown', keyEvent);
+	var ups = keyStream(document, 'keyup', keyEvent);
+	var presses = keyStream(document, 'keypress', keyEvent);
+	var blurs = keyStream(window, 'blur', function() { return null; });
+
+
+	return localRuntime.Native.Keyboard.values = {
+		downs: downs,
+		ups: ups,
+		blurs: blurs,
+		presses: presses
 	};
 
 };
@@ -13003,7 +13231,7 @@ Elm.Stamps.make = function (_elm) {
                switch (_v0.ctor)
                {case "_Tuple3": return _v0._2;}
                _U.badCase($moduleName,
-               "on line 323, column 33 to 34");
+               "on line 322, column 33 to 34");
             }();
          };
          var dir = function (_v5) {
@@ -13011,7 +13239,7 @@ Elm.Stamps.make = function (_elm) {
                switch (_v5.ctor)
                {case "_Tuple3": return _v5._1;}
                _U.badCase($moduleName,
-               "on line 322, column 28 to 29");
+               "on line 321, column 28 to 29");
             }();
          };
          var origin = function (_v10) {
@@ -13020,7 +13248,7 @@ Elm.Stamps.make = function (_elm) {
                {case "_Tuple3":
                   return _v10._0;}
                _U.badCase($moduleName,
-               "on line 321, column 31 to 32");
+               "on line 320, column 31 to 32");
             }();
          };
          var form = $Graphics$Collage.group(A2($List.map,
@@ -13811,7 +14039,7 @@ Elm.Stamps.make = function (_elm) {
                     },
                     angles);}
                _U.badCase($moduleName,
-               "on line 124, column 40 to 186");
+               "on line 123, column 40 to 186");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -13862,7 +14090,7 @@ Elm.Stamps.make = function (_elm) {
                          break;}
                     break;}
                _U.badCase($moduleName,
-               "on line 135, column 31 to 52");
+               "on line 134, column 31 to 52");
             }();
          };
          var angles = A2($List.map,
@@ -13892,12 +14120,12 @@ Elm.Stamps.make = function (_elm) {
                                          _v89._1 + _v82._2,
                                          2)};}
                                _U.badCase($moduleName,
-                               "on line 137, column 80 to 141");
+                               "on line 136, column 80 to 141");
                             }();
                          })(orient(angles));}
                     break;}
                _U.badCase($moduleName,
-               "on line 137, column 48 to 161");
+               "on line 136, column 48 to 161");
             }();
          };
          return $Set.toList(A3(addNeighbors,
@@ -14486,7 +14714,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: _v0._0
                    ,_1: 0 - _v0._1};}
          _U.badCase($moduleName,
-         "on line 137, column 18 to 22");
+         "on line 167, column 18 to 22");
       }();
    };
    var perp = function (_v4) {
@@ -14497,7 +14725,7 @@ Elm.Util.make = function (_elm) {
                    ,_0: _v4._1
                    ,_1: 0 - _v4._0};}
          _U.badCase($moduleName,
-         "on line 117, column 15 to 19");
+         "on line 147, column 15 to 19");
       }();
    };
    var mapBetween = F2(function (f,
@@ -14518,7 +14746,7 @@ Elm.Util.make = function (_elm) {
                    _v8._1._1)));}
               break;}
          _U.badCase($moduleName,
-         "between lines 109 and 111");
+         "between lines 130 and 132");
       }();
    });
    var getIndexOf = F2(function (a,
@@ -14530,7 +14758,7 @@ Elm.Util.make = function (_elm) {
               a,
               _v14._1);}
          _U.badCase($moduleName,
-         "between lines 104 and 106");
+         "between lines 125 and 127");
       }();
    });
    var get = F2(function (i,_v18) {
@@ -14541,7 +14769,25 @@ Elm.Util.make = function (_elm) {
               i - 1,
               _v18._1);}
          _U.badCase($moduleName,
-         "on line 101, column 17 to 51");
+         "on line 122, column 17 to 51");
+      }();
+   });
+   var minimumBy = F2(function (f,
+   xs) {
+      return function () {
+         var xs$ = A2($List.map,f,xs);
+         return _U.cmp($List.length(xs$),
+         0) > 0 ? $Maybe.Just(A2(get,
+         A2(getIndexOf,
+         function () {
+            var _v22 = $List.minimum(xs$);
+            switch (_v22.ctor)
+            {case "Just": return _v22._0;}
+            _U.badCase($moduleName,
+            "on line 140, column 43 to 79");
+         }(),
+         xs$),
+         xs)) : $Maybe.Nothing;
       }();
    });
    var $delete = F2(function (i,
@@ -14549,6 +14795,20 @@ Elm.Util.make = function (_elm) {
       return A2($Basics._op["++"],
       A2($List.take,i,xs),
       A2($List.drop,i + 1,xs));
+   });
+   var middleList = function (xs) {
+      return $List.drop(1)(A2($List.take,
+      $List.length(xs) - 1,
+      xs));
+   };
+   var insertList = F3(function (i,
+   v,
+   l) {
+      return A2($Basics._op["++"],
+      A2($List.take,i,l),
+      A2($Basics._op["++"],
+      _L.fromArray([v]),
+      A2($List.drop,i,l)));
    });
    var replaceList = F3(function (i,
    v,
@@ -14561,100 +14821,100 @@ Elm.Util.make = function (_elm) {
    });
    var end = function (xs) {
       return function () {
-         var _v22 = $List.head($List.reverse(xs));
-         switch (_v22.ctor)
-         {case "Just": return _v22._0;}
+         var _v24 = $List.head($List.reverse(xs));
+         switch (_v24.ctor)
+         {case "Just": return _v24._0;}
          _U.badCase($moduleName,
-         "on line 92, column 10 to 57");
+         "on line 107, column 10 to 57");
       }();
    };
-   var dot = F2(function (_v24,
-   _v25) {
+   var dot = F2(function (_v26,
+   _v27) {
       return function () {
-         switch (_v25.ctor)
+         switch (_v27.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v24.ctor)
+                 switch (_v26.ctor)
                  {case "_Tuple2":
-                    return _v24._0 * _v25._0 + _v24._1 * _v25._1;}
+                    return _v26._0 * _v27._0 + _v26._1 * _v27._1;}
                  _U.badCase($moduleName,
-                 "on line 89, column 23 to 36");
+                 "on line 104, column 23 to 36");
               }();}
          _U.badCase($moduleName,
-         "on line 89, column 23 to 36");
+         "on line 104, column 23 to 36");
       }();
    });
-   var mag = function (_v32) {
+   var mag = function (_v34) {
       return function () {
-         switch (_v32.ctor)
+         switch (_v34.ctor)
          {case "_Tuple2":
-            return $Basics.sqrt(Math.pow(_v32._0,
-              2) + Math.pow(_v32._1,2));}
+            return $Basics.sqrt(Math.pow(_v34._0,
+              2) + Math.pow(_v34._1,2));}
          _U.badCase($moduleName,
-         "on line 86, column 13 to 26");
+         "on line 101, column 13 to 26");
       }();
    };
    var proj = F2(function (v,r) {
       return A2(dot,v,r) / mag(v);
    });
-   _op[".-"] = F2(function (_v36,
-   _v37) {
+   _op[".-"] = F2(function (_v38,
+   _v39) {
       return function () {
-         switch (_v37.ctor)
+         switch (_v39.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v36.ctor)
+                 switch (_v38.ctor)
                  {case "_Tuple2":
                     return {ctor: "_Tuple2"
-                           ,_0: _v36._0 - _v37._0
-                           ,_1: _v36._1 - _v37._1};}
+                           ,_0: _v38._0 - _v39._0
+                           ,_1: _v38._1 - _v39._1};}
                  _U.badCase($moduleName,
-                 "on line 79, column 23 to 33");
+                 "on line 94, column 23 to 33");
               }();}
          _U.badCase($moduleName,
-         "on line 79, column 23 to 33");
+         "on line 94, column 23 to 33");
       }();
    });
-   _op[".+"] = F2(function (_v44,
-   _v45) {
+   _op[".+"] = F2(function (_v46,
+   _v47) {
       return function () {
-         switch (_v45.ctor)
+         switch (_v47.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v44.ctor)
+                 switch (_v46.ctor)
                  {case "_Tuple2":
                     return {ctor: "_Tuple2"
-                           ,_0: _v44._0 + _v45._0
-                           ,_1: _v44._1 + _v45._1};}
+                           ,_0: _v46._0 + _v47._0
+                           ,_1: _v46._1 + _v47._1};}
                  _U.badCase($moduleName,
-                 "on line 75, column 23 to 33");
+                 "on line 90, column 23 to 33");
               }();}
          _U.badCase($moduleName,
-         "on line 75, column 23 to 33");
+         "on line 90, column 23 to 33");
       }();
    });
    _op[".*"] = F2(function (k,
-   _v52) {
+   _v54) {
       return function () {
-         switch (_v52.ctor)
+         switch (_v54.ctor)
          {case "_Tuple2":
             return {ctor: "_Tuple2"
-                   ,_0: k * _v52._0
-                   ,_1: k * _v52._1};}
+                   ,_0: k * _v54._0
+                   ,_1: k * _v54._1};}
          _U.badCase($moduleName,
-         "on line 71, column 17 to 25");
+         "on line 86, column 17 to 25");
       }();
    });
-   _op["./"] = F2(function (_v56,
+   _op["./"] = F2(function (_v58,
    k) {
       return function () {
-         switch (_v56.ctor)
+         switch (_v58.ctor)
          {case "_Tuple2":
             return {ctor: "_Tuple2"
-                   ,_0: _v56._0 / k
-                   ,_1: _v56._1 / k};}
+                   ,_0: _v58._0 / k
+                   ,_1: _v58._1 / k};}
          _U.badCase($moduleName,
-         "on line 67, column 17 to 25");
+         "on line 82, column 17 to 25");
       }();
    });
    var unitize = function (v) {
@@ -14663,62 +14923,62 @@ Elm.Util.make = function (_elm) {
       mag(v));
    };
    var toRelativeCoords = F2(function (p,
-   _v60) {
+   _v62) {
       return function () {
-         switch (_v60.ctor)
+         switch (_v62.ctor)
          {case "_Tuple2":
             return function () {
                  var x = A2(_op[".-"],
                  p,
-                 _v60._0);
+                 _v62._0);
                  var se = unitize(A2(_op[".-"],
-                 _v60._1,
-                 _v60._0));
+                 _v62._1,
+                 _v62._0));
                  var se$ = perp(se);
                  return {ctor: "_Tuple2"
                         ,_0: A2(proj,se,x)
                         ,_1: A2(proj,se$,x)};
               }();}
          _U.badCase($moduleName,
-         "between lines 121 and 126");
+         "between lines 151 and 156");
       }();
    });
-   var fromRelativeCoords = F2(function (_v64,
-   _v65) {
+   var fromRelativeCoords = F2(function (_v66,
+   _v67) {
       return function () {
-         switch (_v65.ctor)
+         switch (_v67.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v64.ctor)
+                 switch (_v66.ctor)
                  {case "_Tuple2":
                     return function () {
                          var se = unitize(A2(_op[".-"],
-                         _v65._1,
-                         _v65._0));
+                         _v67._1,
+                         _v67._0));
                          var se$ = perp(se);
                          return A2(_op[".+"],
-                         _v65._0,
+                         _v67._0,
                          A2(_op[".+"],
-                         A2(_op[".*"],_v64._0,se),
-                         A2(_op[".*"],_v64._1,se$)));
+                         A2(_op[".*"],_v66._0,se),
+                         A2(_op[".*"],_v66._1,se$)));
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 130 and 134");
+                 "between lines 160 and 164");
               }();}
          _U.badCase($moduleName,
-         "between lines 130 and 134");
+         "between lines 160 and 164");
       }();
    });
-   var distSquared = F2(function (_v72,
-   _v73) {
+   var distSquared = F2(function (_v74,
+   _v75) {
       return function () {
-         switch (_v73.ctor)
+         switch (_v75.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v72.ctor)
+                 switch (_v74.ctor)
                  {case "_Tuple2":
-                    return Math.pow(_v72._0 - _v73._0,
-                      2) + Math.pow(_v72._1 - _v73._1,
+                    return Math.pow(_v74._0 - _v75._0,
+                      2) + Math.pow(_v74._1 - _v75._1,
                       2);}
                  _U.badCase($moduleName,
                  "on line 61, column 32 to 52");
@@ -14731,6 +14991,74 @@ Elm.Util.make = function (_elm) {
       return $Basics.sqrt(A2(distSquared,
       p1,
       p2));
+   });
+   var distPointEdge = F2(function (_v82,
+   _v83) {
+      return function () {
+         switch (_v83.ctor)
+         {case "_Tuple2":
+            switch (_v83._0.ctor)
+              {case "_Tuple2":
+                 switch (_v83._1.ctor)
+                   {case "_Tuple2":
+                      return function () {
+                           switch (_v82.ctor)
+                           {case "_Tuple2":
+                              return function () {
+                                   var distBetweenEnds = A2(dist,
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v83._0._0
+                                   ,_1: _v83._0._1},
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v83._1._0
+                                   ,_1: _v83._1._1});
+                                   var edge = {ctor: "_Tuple2"
+                                              ,_0: _v83._1._0 - _v83._0._0
+                                              ,_1: _v83._1._1 - _v83._0._1};
+                                   var $ = edge,
+                                   xEdge = $._0,
+                                   yEdge = $._1;
+                                   var distFromLine = $Basics.abs(A2(proj,
+                                   {ctor: "_Tuple2"
+                                   ,_0: 0 - yEdge
+                                   ,_1: xEdge},
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v82._0 - _v83._0._0
+                                   ,_1: _v82._1 - _v83._0._1}));
+                                   var parallelProj1 = $Basics.abs(A2(proj,
+                                   edge,
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v83._0._0 - _v82._0
+                                   ,_1: _v83._0._1 - _v82._1}));
+                                   var parallelProj2 = $Basics.abs(A2(proj,
+                                   edge,
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v83._1._0 - _v82._0
+                                   ,_1: _v83._1._1 - _v82._1}));
+                                   return _U.cmp(parallelProj1,
+                                   distBetweenEnds) > 0 ? A2(dist,
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v83._1._0
+                                   ,_1: _v83._1._1},
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v82._0
+                                   ,_1: _v82._1}) : _U.cmp(parallelProj2,
+                                   distBetweenEnds) > 0 ? A2(dist,
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v83._0._0
+                                   ,_1: _v83._0._1},
+                                   {ctor: "_Tuple2"
+                                   ,_0: _v82._0
+                                   ,_1: _v82._1}) : distFromLine;
+                                }();}
+                           _U.badCase($moduleName,
+                           "between lines 68 and 79");
+                        }();}
+                   break;}
+              break;}
+         _U.badCase($moduleName,
+         "between lines 68 and 79");
+      }();
    });
    var unions = A2($List.foldl,
    $Set.union,
@@ -14753,23 +15081,23 @@ Elm.Util.make = function (_elm) {
       return _U.cmp(x,
       2 * $Basics.pi) > -1 ? rem2pi(x - 2 * $Basics.pi) : x;
    };
-   var sideToEdge = function (_v80) {
+   var sideToEdge = function (_v94) {
       return function () {
-         switch (_v80.ctor)
+         switch (_v94.ctor)
          {case "::":
             return {ctor: "_Tuple2"
-                   ,_0: _v80._0
-                   ,_1: end(_v80._1)};}
+                   ,_0: _v94._0
+                   ,_1: end(_v94._1)};}
          _U.badCase($moduleName,
          "on line 43, column 23 to 32");
       }();
    };
-   var edgeToSide = function (_v84) {
+   var edgeToSide = function (_v98) {
       return function () {
-         switch (_v84.ctor)
+         switch (_v98.ctor)
          {case "_Tuple2":
-            return _L.fromArray([_v84._0
-                                ,_v84._1]);}
+            return _L.fromArray([_v98._0
+                                ,_v98._1]);}
          _U.badCase($moduleName,
          "on line 40, column 20 to 25");
       }();
@@ -14829,15 +15157,19 @@ Elm.Util.make = function (_elm) {
                       ,unions: unions
                       ,distSquared: distSquared
                       ,dist: dist
+                      ,distPointEdge: distPointEdge
                       ,proj: proj
                       ,mag: mag
                       ,dot: dot
                       ,end: end
                       ,replaceList: replaceList
+                      ,insertList: insertList
+                      ,middleList: middleList
                       ,$delete: $delete
                       ,get: get
                       ,getIndexOf: getIndexOf
                       ,mapBetween: mapBetween
+                      ,minimumBy: minimumBy
                       ,unitize: unitize
                       ,perp: perp
                       ,toRelativeCoords: toRelativeCoords

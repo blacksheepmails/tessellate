@@ -63,6 +63,21 @@ distSquared (x1,y1) (x2,y2) = (x1-x2)^2 + (y1-y2)^2
 dist : Point -> Point -> Float
 dist p1 p2 = sqrt <| distSquared p1 p2
 
+distPointEdge : Point -> Edge -> Float
+distPointEdge (x,y) ((x1,y1),(x2,y2)) =
+    let
+        edge = (x2-x1, y2-y1)
+        (xEdge, yEdge) = edge
+        distFromLine = abs <| proj (-yEdge, xEdge) (x-x1,y-y1)
+        distBetweenEnds = dist (x1,y1) (x2,y2)
+        parallelProj1 = abs <| proj edge (x1-x,y1-y)
+        parallelProj2 = abs <| proj edge (x2-x,y2-y)
+    in
+        if
+        | parallelProj1 > distBetweenEnds -> dist (x2,y2) (x,y)
+        | parallelProj2 > distBetweenEnds -> dist (x1,y1) (x,y)
+        | otherwise -> distFromLine
+
 (./) : Point -> Float -> Point
 (./) (x,y) k = (x/k, y/k)
 infixr 7 ./
@@ -94,6 +109,12 @@ end xs = case List.head (List.reverse xs) of Just v -> v
 replaceList : Int -> a -> List a -> List a
 replaceList i v l = (List.take i l) ++ [v] ++ (List.drop (i+1) l)
 
+insertList : Int -> a -> List a -> List a
+insertList i v l = (List.take i l) ++ [v] ++ (List.drop i l)
+
+middleList : List a -> List a
+middleList xs = List.drop 1 <| List.take (List.length xs - 1) xs
+
 delete : Int -> List a -> List a
 delete i xs = (List.take i xs) ++ (List.drop (i+1) xs)
 
@@ -109,6 +130,15 @@ mapBetween : (a -> a -> b) -> List a -> List b
 mapBetween f (x::y::xs) = if
     | xs == [] -> [f x y]
     | otherwise -> f x y :: mapBetween f (y::xs)
+
+minimumBy : (a -> comparable) -> List a -> Maybe a
+minimumBy f xs = 
+    let
+        xs' = List.map f xs 
+    in 
+        if List.length xs' > 0 
+            then Just <| get (getIndexOf (case List.minimum xs' of Just v -> v) xs') xs 
+            else Nothing
 
 unitize : (Float,Float) -> Point
 unitize v = v ./ (mag v)
